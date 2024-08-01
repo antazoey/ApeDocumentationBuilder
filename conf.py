@@ -61,15 +61,18 @@ plausible_domain = "docs.apeworx.io"
 # a list of builtin themes.
 #
 html_theme = "shibuya"
-html_favicon = "favicon.ico"
-html_logo = "logo.gif"
+html_favicon = "_static/favicon.ico"
 html_baseurl = GITHUB_REPO
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
-
+html_static_path = ["_static"]
+html_theme_options = {
+    "light_logo": "_static/logo_grey.svg",
+    "dark_logo": "_static/logo_green.svg",
+    "accent_color": "lime",
+}
 # These paths are either relative to html_static_path
 # or fully qualified paths (eg. https://...)
 html_css_files = []
@@ -78,6 +81,14 @@ html_css_files = []
 # since not all links are available in the markdown files pre-build.
 myst_all_links_external = True
 
+# Set some default to avoid unnecessary repetitious directives.
+autodoc_default_options = {
+    "exclude-members": (
+        "__repr__, __weakref__, __metaclass__, __init__, __format__,  __new__, __str__, __dir__,"
+        "model_config, model_fields, model_post_init, model_computed_fields,"
+        "__ape_extra_attributes__,"
+    )
+}
 
 def fixpath(path: str) -> str:
     """
