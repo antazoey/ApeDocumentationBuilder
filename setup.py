@@ -30,7 +30,6 @@ extras_require = {
         "sphinx_rtd_theme>=1.2.0,<2",  # Readthedocs.org theme
         "sphinxcontrib-napoleon>=0.7",  # Allow Google-style documentation
         "sphinx-plausible>=0.1.2,<0.2",
-        "shibuya",
     ],
     "release": [  # `release` GitHub Action job uses this
         "setuptools",  # Installation tool
@@ -62,14 +61,14 @@ setup(
     name="docs-build",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="""docs-build: Documentation""",
+    description="""docs-build: Build Sphinx Documentation for ApeWorX plugins""",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ApeWorX Ltd.",
     author_email="admin@apeworx.io",
     url="https://github.com/ApeWorX/docs-build",
     include_package_data=True,
-    install_requires=[],
+    install_requires=["shibuya=22024.7.13",],
     python_requires=">=3.9,<4",
     extras_require=extras_require,
     py_modules=["docs_build"],
