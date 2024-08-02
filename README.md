@@ -8,7 +8,7 @@ A script that uses sphinx to develop documentation for ApeWorX plugins.
 
 ## Quick Usage
 
-To use this to build the documentation in an Ape plugin, add this to the `docs.yaml`
+To use this to build the documentation in an Ape plugin, add this to your documentation workflow (e.g. your `.github/workflows/docs.yaml` file).
 
 ```bash
         - name: Clone ApeDocumentationBuilder
