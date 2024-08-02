@@ -3,10 +3,6 @@ from setuptools import find_packages, setup
 
 extras_require = {
     "test": [  # `test` GitHub Action jobs uses this
-        "pytest>=6.0",  # Core testing package
-        "pytest-xdist",  # Multi-process runner
-        "pytest-cov",  # Coverage analyzer plugin
-        "hypothesis>=6.2.0,<7.0",  # Strategy-based fuzzer
     ],
     "lint": [
         "black>=24.4.2,<25",  # Auto-formatter and linter
