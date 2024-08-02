@@ -2,8 +2,7 @@
 from setuptools import find_packages, setup
 
 extras_require = {
-    "test": [  # `test` GitHub Action jobs uses this
-    ],
+    "test": [],  # `test` GitHub Action jobs uses this
     "lint": [
         "black>=24.4.2,<25",  # Auto-formatter and linter
         "mypy>=1.10.0,<2",  # Static type analyzer
