@@ -1,7 +1,6 @@
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 REDIRECT_HTML = """
@@ -10,10 +9,10 @@ REDIRECT_HTML = """
 <title>Redirecting...</title>
 <meta http-equiv="refresh" content="0; URL=./{}/">
 """
-GITHUB_REPO = os.getenv('GITHUB_REPO')
+GITHUB_REPO = os.getenv("GITHUB_REPO")
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, '..'))
-SOURCE_DIR = os.path.join(PROJECT_ROOT, 'docs')
+PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, ".."))
+SOURCE_DIR = os.path.join(PROJECT_ROOT, "docs")
 
 DOCS_BUILD = os.path.join(PROJECT_ROOT, f"docs/_build/{GITHUB_REPO}")
 DOCS_BUILD_PATH = Path(f"{DOCS_BUILD}")
@@ -24,13 +23,13 @@ STABLE_PATH = DOCS_BUILD_PATH / "stable"
 class ApeDocsBuildError(Exception):
     pass
 
-    
+
 def git(*args):
     return subprocess.check_output(["git", *args]).decode("ascii").strip()
 
 
 def new_dir(path: Path) -> Path:
-    if path.exists():
+    if path.is_dir():
         shutil.rmtree(path)
 
     path.mkdir(parents=True)
@@ -78,7 +77,7 @@ def main():
             # Clean-up unnecessary extra 'fonts/' directories to save space.
             # There should still be one in 'latest/'
             for font_dirs in build_dir.glob("**/fonts"):
-                if font_dirs.exists():
+                if font_dirs.is_dir():
                     shutil.rmtree(font_dirs)
 
             shutil.copytree(build_dir, STABLE_PATH)

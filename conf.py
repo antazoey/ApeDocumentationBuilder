@@ -10,16 +10,10 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import re
 import sys
-from functools import lru_cache
-from pathlib import Path
-
-import requests
-from semantic_version import Version  # type: ignore
 
 sys.path.insert(0, os.path.abspath(".."))
-GITHUB_REPO = os.getenv('GITHUB_REPO')
+GITHUB_REPO = os.getenv("GITHUB_REPO")
 # -- Project information -----------------------------------------------------
 
 project = GITHUB_REPO
@@ -73,9 +67,6 @@ html_theme_options = {
     "dark_logo": "_static/logo_green.svg",
     "accent_color": "lime",
 }
-# These paths are either relative to html_static_path
-# or fully qualified paths (eg. https://...)
-html_css_files = []
 
 # Currently required for how we handle method docs links in the Myst parser
 # since not all links are available in the markdown files pre-build.
@@ -84,42 +75,8 @@ myst_all_links_external = True
 # Set some default to avoid unnecessary repetitious directives.
 autodoc_default_options = {
     "exclude-members": (
-        "__repr__, __weakref__, __metaclass__, __init__, __format__,  __new__, __str__, __dir__,"
+        "__weakref__, __metaclass__, __init__, __format__,  __new__, __dir__,"
         "model_config, model_fields, model_post_init, model_computed_fields,"
         "__ape_extra_attributes__,"
     )
-}
-
-def fixpath(path: str) -> str:
-    """
-    Change paths to reference the resources from 'latest/' to save room.
-    """
-    suffix = path.split("_static")[1]
-    new = f"/{GITHUB_REPO}/latest/_static"
-
-    if suffix:
-        new = str(Path(new) / suffix.lstrip("/"))
-
-    return new
-
-
-@lru_cache(maxsize=None)
-def get_versions() -> list[str]:
-    """
-    Get all the versions from the Web.
-    """
-    api_url = f"https://api.github.com/repos/ApeWorx/{GITHUB_REPO}/git/trees/gh-pages?recursive=1"
-    response = requests.get(api_url)
-    response.raise_for_status()
-    pattern = re.compile(r"v\d+.?\d+.?\d+$")
-    data = response.json()
-    tree = data.get("tree", [])
-    versions = list({x["path"] for x in tree if x["type"] == "tree" and pattern.match(x["path"])})
-    sorted_version_objs = sorted([Version(v.lstrip("v")) for v in versions], reverse=True)
-    return [f"v{x}" for x in sorted_version_objs]
-
-
-html_context = {
-    "fixpath": fixpath,
-    "get_versions": get_versions,
 }
