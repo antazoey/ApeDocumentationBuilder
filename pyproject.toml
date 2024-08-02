@@ -17,19 +17,6 @@ line-length = 100
 target-version = ['py39', 'py310', 'py311', 'py312']
 include = '\.pyi?$'
 
-[tool.pytest.ini_options]
-addopts = """
-    -p no:ape_test
-    --cov-branch
-    --cov-report term
-    --cov-report html
-    --cov-report xml
-    --cov=docs_build
-"""
-python_files = "test_*.py"
-testpaths = "tests"
-markers = "fuzzing: Run Hypothesis fuzz test suite"
-
 [tool.isort]
 line_length = 100
 force_grid_wrap = 0
