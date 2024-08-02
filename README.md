@@ -6,29 +6,23 @@ A script that uses sphinx to develop documentation for ApeWorX plugins.
 
 - [python3](https://www.python.org/downloads) version 3.9 up to 3.12.
 
-## Installation
-
-### via `pip`
-
-You can install the latest release via [`pip`](https://pypi.org/project/pip/):
-
-```bash
-pip install docs-build
-```
-
-### via `setuptools`
-
-You can clone the repository and use [`setuptools`](https://github.com/pypa/setuptools) for the most up-to-date version:
-
-```bash
-git clone https://github.com/ApeWorX/docs-build.git
-cd docs-build
-python3 setup.py install
-```
-
 ## Quick Usage
 
-TODO: Describe library overview in code
+To use this to build the documentation in an Ape plugin, add this to the `docs.yaml`
+
+```bash
+        - name: Clone ape-docs-build
+          run: git clone https://github.com/ApeWorX/ape-docs-build.git
+
+        - name: Set up environment variable
+          run: echo "GITHUB_REPO=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)" >> $GITHUB_ENV
+
+        - name: Build HTML artifact
+          run: |
+            cd ape-docs-build
+            python build_docs.py
+
+```
 
 ## Development
 
