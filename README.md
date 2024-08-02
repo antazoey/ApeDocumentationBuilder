@@ -11,15 +11,15 @@ A script that uses sphinx to develop documentation for ApeWorX plugins.
 To use this to build the documentation in an Ape plugin, add this to the `docs.yaml`
 
 ```bash
-        - name: Clone ape-docs-build
-          run: git clone https://github.com/ApeWorX/ape-docs-build.git
+        - name: Clone ApeDocumentationBuilder
+          run: git clone https://github.com/ApeWorX/ApeDocumentationBuilder.git
 
         - name: Set up environment variable
           run: echo "GITHUB_REPO=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)" >> $GITHUB_ENV
 
         - name: Build HTML artifact
           run: |
-            cd ape-docs-build
+            cd ApeDocumentationBuilder
             python build_docs.py
 
 ```

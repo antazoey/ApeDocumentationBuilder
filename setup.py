@@ -58,25 +58,23 @@ with open("./README.md") as readme:
 
 
 setup(
-    name="docs-build",
+    name="ApeDocumentationBuilder",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="docs-build: Build Sphinx Documentation for ApeWorX plugins",
+    description="ApeDocumentationBuilder: Build Sphinx Documentation for ApeWorX plugins",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ApeWorX Ltd.",
     author_email="admin@apeworx.io",
-    url="https://github.com/ApeWorX/docs-build",
+    url="https://github.com/ApeWorX/ApeDocumentationBuilder",
     include_package_data=True,
     install_requires=["shibuya"],
     python_requires=">=3.9,<4",
     extras_require=extras_require,
-    py_modules=["docs_build"],
     license="Apache-2.0",
     zip_safe=False,
     keywords="ethereum",
     packages=find_packages(exclude=["tests", "tests.*"]),
-    package_data={"docs_build": ["py.typed"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
