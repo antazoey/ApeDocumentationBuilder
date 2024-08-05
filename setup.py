@@ -40,12 +40,7 @@ extras_require = {
 }
 
 # NOTE: `pip install -e .[dev]` to install package
-extras_require["dev"] = (
-    extras_require["test"]
-    + extras_require["lint"]
-    + extras_require["release"]
-    + extras_require["dev"]
-)
+extras_require["dev"] = extras_require["lint"] + extras_require["release"] + extras_require["dev"]
 
 with open("./README.md") as readme:
     long_description = readme.read()
