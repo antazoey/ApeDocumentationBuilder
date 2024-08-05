@@ -2,12 +2,6 @@
 from setuptools import find_packages, setup
 
 extras_require = {
-    "test": [  # `test` GitHub Action jobs uses this
-        "pytest>=6.0",  # Core testing package
-        "pytest-xdist",  # Multi-process runner
-        "pytest-cov",  # Coverage analyzer plugin
-        "hypothesis>=6.2.0,<7.0",  # Strategy-based fuzzer
-    ],
     "lint": [
         "black>=24.4.2,<25",  # Auto-formatter and linter
         "mypy>=1.10.0,<2",  # Static type analyzer
@@ -21,6 +15,15 @@ extras_require = {
         "mdformat-gfm>=0.3.5",  # Needed for formatting GitHub-flavored markdown
         "mdformat-frontmatter>=0.4.1",  # Needed for frontmatters-style headers in issue templates
         "mdformat-pyproject>=0.0.1",  # Allows configuring in pyproject.toml
+    ],
+    "doc": [
+        "pygments>=2.17.0,<3",  # Needed for the Vyper lexer
+        "myst-parser>=1.0.0,<2",  # Parse markdown docs
+        "sphinx-click>=4.4.0,<5",  # For documenting CLI
+        "Sphinx>=6.1.3,<7",  # Documentation generator
+        "sphinx_rtd_theme>=1.2.0,<2",  # Readthedocs.org theme
+        "sphinxcontrib-napoleon>=0.7",  # Allow Google-style documentation
+        "sphinx-plausible>=0.1.2,<0.2",  # For analytics
     ],
     "release": [  # `release` GitHub Action job uses this
         "setuptools",  # Installation tool
@@ -37,37 +40,30 @@ extras_require = {
 }
 
 # NOTE: `pip install -e .[dev]` to install package
-extras_require["dev"] = (
-    extras_require["test"]
-    + extras_require["lint"]
-    + extras_require["release"]
-    + extras_require["dev"]
-)
+extras_require["dev"] = extras_require["lint"] + extras_require["release"] + extras_require["dev"]
 
 with open("./README.md") as readme:
     long_description = readme.read()
 
 
 setup(
-    name="<PYPI_NAME>",
+    name="ApeDocumentationBuilder",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    description="""<PYPI_NAME>: <SHORT_DESCRIPTION>""",
+    description="ApeDocumentationBuilder: Build Sphinx Documentation for ApeWorX plugins",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ApeWorX Ltd.",
     author_email="admin@apeworx.io",
-    url="https://github.com/ApeWorX/<REPO_NAME>",
+    url="https://github.com/ApeWorX/ApeDocumentationBuilder",
     include_package_data=True,
-    install_requires=[],
+    install_requires=["shibuya"],
     python_requires=">=3.9,<4",
     extras_require=extras_require,
-    py_modules=["<MODULE_NAME>"],
     license="Apache-2.0",
     zip_safe=False,
     keywords="ethereum",
     packages=find_packages(exclude=["tests", "tests.*"]),
-    package_data={"<MODULE_NAME>": ["py.typed"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
