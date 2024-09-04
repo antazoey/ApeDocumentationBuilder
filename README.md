@@ -1,6 +1,7 @@
 # Quick Start
 
-A script that uses sphinx to develop documentation for ApeWorX plugins.
+`sphinx-ape` is a documenation for plugin for the Sphinx framework.
+The purpose of this plugin to share code for generating documentation across all ApeWorX repositories.
 
 ## Dependencies
 
@@ -8,52 +9,55 @@ A script that uses sphinx to develop documentation for ApeWorX plugins.
 
 ## Quick Usage
 
-To use this to build the documentation in an Ape plugin, add this to your documentation workflow (e.g. your `.github/workflows/docs.yaml` file).
+To use this sphinx plugin, create a `docs/` folder in your Python package.
+Inside this folder, create a `conf.py` with the following content:
 
-```bash
-- name: Clone ApeDocumentationBuilder
-  run: git clone https://github.com/ApeWorX/ApeDocumentationBuilder.git
-
-- name: Set up environment variable
-  run: echo "GITHUB_REPO=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)" >> $GITHUB_ENV
-
-- name: Build HTML artifact
-  run: |
-    cd ApeDocumentationBuilder
-    python build_docs.py
+```txt
+extensions = ["sphinx_ape"]
 ```
 
-### Running the docs locally
+Then, create an `index.rst` file with the following content:
 
-First, clone the repo into your root project directory.
-
-```bash
-git clone https://github.com/ApeWorX/ApeDocumentationBuilder.git
+```txt
+.. dynamic-toc-tree::
 ```
 
-Then, set up the `GITHUB_REPO` environment variable:
+You don't have to configure anything else; it will just work.
 
-```bash
-export GITHUB_REPO=<project-name>
+Now, you can begin writing your documentation.
+There are three directories you can create:
+
+1. `userguides/` - a directory containing how-to guides for how to use your package.
+2. `commands/` - `.rst` files for the `sphinx-click` plugin for CLI-based references.
+3. `methoddocs` - Autodoc `.rst` files controlling your generated method documentation.
+
+Once you have developed your documentation, ensure you have `sphinx-ape` installed.
+For example, clone this repo and install it using `pip install <path/to/sphinx-ape>` or install from `pypi` by doing `pip intall sphinx-ape`.
+
+After \`sphinx-ape\`\` is installed, build your projects' documentation by doing:
+
+```sh
+sphinx-ape build <path/to/project>
 ```
 
-Next, run the following in the `ApeDocumentationBuilder` directory:
+Most commonly, you will already be in your project's directory, so you will do:
 
-```bash
-cd ApeDocumentationBuilder
-python build_docs.py
+```sh
+sphinx-ape build .
 ```
 
-For the best viewing experience, use a local server:
+Then, to view the documentation, run the `serve` command:
 
-```bash
-python -m http.server --directory "../docs/_build/" --bind 127.0.0.1 1337
+```sh
+sphinx-ape serve <path/to/project>
+# When in directory already
+sphinx-ape serve .
 ```
 
-Then, open your browser to `127.0.0.1:1337` and click the `ape` directory link.
+To automatically open a browser at the same time as serving, use the `--open` flag:
 
-```{note}
-Serving from `"docs/_build/"` rather than `"docs/_build/<project>"` is necessary to make routing work.
+```sh
+sphinx-ape serve . --open
 ```
 
 ## Development
