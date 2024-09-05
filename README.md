@@ -1,6 +1,6 @@
 # Quick Start
 
-`sphinx-ape` is a documenation for plugin for the Sphinx framework.
+`sphinx-ape` is a documenation plugin for the Sphinx framework.
 The purpose of this plugin to share code for generating documentation across all ApeWorX repositories.
 
 ## Dependencies
@@ -29,12 +29,12 @@ There are three directories you can create:
 
 1. `userguides/` - a directory containing how-to guides for how to use your package.
 2. `commands/` - `.rst` files for the `sphinx-click` plugin for CLI-based references.
-3. `methoddocs` - Autodoc `.rst` files controlling your generated method documentation.
+3. `methoddocs/` - Autodoc `.rst` files controlling your generated method documentation.
 
 Once you have developed your documentation, ensure you have `sphinx-ape` installed.
 For example, clone this repo and install it using `pip install <path/to/sphinx-ape>` or install from `pypi` by doing `pip intall sphinx-ape`.
 
-After \`sphinx-ape\`\` is installed, build your projects' documentation by doing:
+After `sphinx-ape` is installed, build your projects' documentation by doing:
 
 ```sh
 sphinx-ape build <path/to/project>
