@@ -60,6 +60,21 @@ To automatically open a browser at the same time as serving, use the `--open` fl
 sphinx-ape serve . --open
 ```
 
+## GitHub Action
+
+This GitHub action is meant for building the documentation in both core Ape as well any Ape plugin.
+The aciton may also work for regular Python packages with a documentation-strategy similar to Ape.
+
+There are three GitHub events that trigger this action:
+
+1. Push to 'main': we build into 'latest/'.
+   The GitHub action will commit these changes to the 'gh-pages' branch.
+
+2. Release: we copy 'latest/' into the release dir, as well as to 'stable/'.
+   The GitHub action will commit these changes to the 'gh-pages' branch.
+
+3. Pull requests or local development: We ensure a successful build.
+
 ## Development
 
 Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.

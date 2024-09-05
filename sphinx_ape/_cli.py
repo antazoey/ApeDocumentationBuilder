@@ -1,21 +1,3 @@
-"""
-This script is meant for building the documentation in both
-core Ape as well as any Ape plugin. This script may also work
-for regular Python packages with a documentation-strategy
-similar to Ape.
-
-Along with this script is a custom GitHub action.
-There are three GitHub events that trigger this script:
-
-1. Push to 'main': we build into 'latest/'.
-    The GitHub action will commit these changes to the 'gh-pages' branch.
-
-2. Release: we copy 'latest/' into the release dir, as well as to 'stable/'.
-    The GitHub action will commit these changes to the 'gh-pages' branch.
-
-3. Pull requests or local development: We ensure a successful build.
-"""
-
 import subprocess
 from pathlib import Path
 

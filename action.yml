@@ -1,4 +1,4 @@
-name: 'ape-documentation-builder'
+name: 'sphinx-ape-action'
 author: 'ApeWorX Ltd.'
 description: 'Build Ape or plugins' documentation'
 branding:
