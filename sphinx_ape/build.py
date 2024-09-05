@@ -1,6 +1,5 @@
 import shutil
 from enum import Enum
-from functools import cached_property
 from pathlib import Path
 from typing import Optional, Union
 
@@ -58,7 +57,7 @@ class DocumentationBuilder:
         self._base_path = base_path or Path.cwd()
         self._name = name or get_package_name()
 
-    @cached_property
+    @property
     def docs_path(self) -> Path:
         return self._base_path / "docs"
 
