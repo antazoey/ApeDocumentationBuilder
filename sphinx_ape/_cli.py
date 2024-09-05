@@ -34,6 +34,17 @@ def package_name_option():
 
 @cli.command()
 @click.argument("base_path", type=Path)
+def init():
+    """
+    Initialize documentation structure
+    """
+    # For this command, force the user to be in that dir.
+    builder = DocumentationBuilder(base_path=Path.cwd())
+    builder.init()
+
+
+@cli.command()
+@click.argument("base_path", type=Path)
 @build_mode_option()
 @package_name_option()
 def build(base_path, mode, package_name):
@@ -42,6 +53,12 @@ def build(base_path, mode, package_name):
     """
     click.echo(f"Building '{package_name}' '{mode.name}'.")
     builder = DocumentationBuilder(mode, base_path=base_path, name=package_name)
+
+    # Ensure all the files that need to exist do exist.
+    builder.init()
+
+    if not builder.docs_path.is_dir():
+        click.echo("docs/ folder missing. Try running:\n\tsphinx-ape init")
 
     try:
         builder.build()

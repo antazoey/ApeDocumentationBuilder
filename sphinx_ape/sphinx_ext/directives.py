@@ -3,6 +3,8 @@ from pathlib import Path
 from docutils.parsers.rst import directives
 from sphinx.util.docutils import SphinxDirective
 
+from sphinx_ape.build import DocumentationBuilder
+
 
 class DynamicTocTree(SphinxDirective):
     """
@@ -38,16 +40,8 @@ class DynamicTocTree(SphinxDirective):
         return f"{title}\n{bar}"
 
     @property
-    def userguides_path(self) -> Path:
-        return self._base_path / "userguides"
-
-    @property
-    def commands_path(self) -> Path:
-        return self._base_path / "commands"
-
-    @property
-    def methoddocs_path(self) -> Path:
-        return self._base_path / "methoddocs"
+    def builder(self) -> DocumentationBuilder:
+        return DocumentationBuilder(base_path=self._base_path.parent)
 
     def run(self):
         userguides = self._get_userguides()
@@ -83,24 +77,10 @@ class DynamicTocTree(SphinxDirective):
         return self.parse_text_to_nodes(restructured_text)
 
     def _get_userguides(self) -> list[str]:
-        guides = self._get_doc_entries(self.userguides_path)
-        quickstart_name = "userguides/quickstart"
-        if quickstart_name in guides:
-            # Make sure quick start is first.
-            guides = [quickstart_name, *[g for g in guides if g != quickstart_name]]
-
-        return guides
+        return [f"userguides/{n}" for n in self.builder.userguide_names]
 
     def _get_cli_references(self) -> list[str]:
-        return self._get_doc_entries(self.commands_path)
+        return [f"commands/{n}" for n in self.builder.cli_reference_names]
 
     def _get_methoddocs(self) -> list[str]:
-        return self._get_doc_entries(self.methoddocs_path)
-
-    def _get_doc_entries(self, path: Path) -> list[str]:
-        if not path.is_dir():
-            return []
-
-        return sorted(
-            [f"{path.name}/{g.stem}" for g in path.iterdir() if g.suffix in (".md", ".rst")]
-        )
+        return [f"methoddocs/{n}" for n in self.builder.methoddoc_names]

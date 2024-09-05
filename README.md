@@ -7,25 +7,28 @@ The purpose of this plugin to share code for generating documentation across all
 
 - [python3](https://www.python.org/downloads) version 3.9 up to 3.12.
 
+## Install
+
+Install using `pip` or `uv` by either cloning this repo or accessing from pypi, e.g.:
+
+```sh
+pip install sphinx-ape
+```
+
+Try `sphinx-ape --help` to check if it's installed.
+
 ## Quick Usage
 
-To use this sphinx plugin, create a `docs/` folder in your Python package.
-Inside this folder, create a `conf.py` with the following content:
+To use this sphinx plugin, first generate the docs structure (ran from your project directory):
 
-```txt
-extensions = ["sphinx_ape"]
+```sh
+sphinx-ape init
 ```
 
-Then, create an `index.rst` file with the following content:
+It will have generated a `docs/` folder with some necessary config file in it, along with a quick-start that links to your `README.md`.
 
-```txt
-.. dynamic-toc-tree::
-```
-
-You don't have to configure anything else; it will just work.
-
-Now, you can begin writing your documentation.
-There are three directories you can create:
+Now, you can begin writing your Sphinx documentation.
+There are three directories you can place documentation sources in:
 
 1. `userguides/` - a directory containing how-to guides for how to use your package.
 2. `commands/` - `.rst` files for the `sphinx-click` plugin for CLI-based references.
