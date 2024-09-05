@@ -2,10 +2,31 @@ import os
 import sys
 from pathlib import Path
 
+from sphinx.util import logging
 from sphinx.application import Sphinx
 
 from sphinx_ape.sphinx_ext.directives import DynamicTocTree
 from sphinx_ape.utils import get_package_name
+
+
+logger = logging.getLogger(__name__)
+
+
+def ensure_quickstart_exists(app, cfg):
+    """
+    This will generate the quickstart guide if needbe.
+    I recommend committing the files it generates.
+    """
+    
+    userguides_path = Path(app.srcdir) / "userguides"
+    quickstart_path = userguides_path / "quickstart.md"
+    if quickstart_path.is_file():
+        # Already exists.
+        return
+    
+    logger.info("Generating userguides/quickstart.md")
+    userguides_path.mkdir(exist_ok=True)
+    quickstart_path.write_text("```{include} ../../README.md\n```\n")
 
 
 def setup(app: Sphinx):
@@ -14,6 +35,9 @@ def setup(app: Sphinx):
     # For building and serving multiple projects at once,
     # we situate ourselves in the parent directory.
     sys.path.insert(0, os.path.abspath(".."))
+
+    # Register the hook that generates the quickstart file if needbe.
+    app.connect("config-inited", ensure_quickstart_exists)
 
     # Configure project and other one-off items.
     package_name = get_package_name()

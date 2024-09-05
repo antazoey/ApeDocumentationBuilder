@@ -66,6 +66,9 @@ class DynamicTocTree(SphinxDirective):
 
         toc_trees = []
         for caption, entries in sections.items():
+            if len(entries) < 1:
+                continue
+
             toc_tree = f".. toctree::\n   :caption: {caption}\n   :maxdepth: 1\n\n"
             for entry in entries:
                 toc_tree += f"   {entry}\n"
@@ -73,7 +76,10 @@ class DynamicTocTree(SphinxDirective):
             toc_trees.append(toc_tree)
 
         toc_tree_rst = "\n".join(toc_trees)
-        restructured_text = f"{self._title_rst}\n\n{toc_tree_rst}"
+        restructured_text = self._title_rst
+        if toc_tree_rst:
+            restructured_text = f"{restructured_text}\n\n{toc_tree_rst}"
+
         return self.parse_text_to_nodes(restructured_text)
 
     def _get_userguides(self) -> list[str]:
