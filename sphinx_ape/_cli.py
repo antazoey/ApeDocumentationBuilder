@@ -131,6 +131,7 @@ def test(base_path):
 
 @cli.command()
 @click.argument("base_path", type=Path)
+@build_mode_option()
 @click.option(
     "--repo",
     "--repository",
@@ -141,11 +142,11 @@ def test(base_path):
     is_flag=True,
     hidden=True,
 )
-def publish(base_path, repo, skip_push):
+def publish(base_path, mode, repo, skip_push):
     """
     Publish docs
     """
-    builder = _create_builder(base_path=base_path)
+    builder = _create_builder(mode=mode, base_path=base_path)
     try:
         builder.publish(repository=repo, push=not skip_push)
     except ApeDocsPublishError as err:
