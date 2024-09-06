@@ -41,6 +41,10 @@ class Documentation:
     def conf_file(self) -> Path:
         return self.docs_path / "conf.py"
 
+    @property
+    def index_file(self) -> Path:
+        return self.build_path / "index.html"
+
     def init(self):
         if not self.docs_path.is_dir():
             self.docs_path.mkdir()

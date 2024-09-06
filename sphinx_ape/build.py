@@ -195,14 +195,10 @@ class DocumentationBuilder(Documentation):
 
     def _setup_redirect(self):
         self.build_path.mkdir(exist_ok=True, parents=True)
-
-        # In the case for local dev (or a new docs-site), the 'stable/'
-        # path will not exist yet, so use 'latest/' instead.
         redirect = "stable" if self.stable_path.is_dir() else "latest"
-
-        index_file = self.build_path / "index.html"
-        index_file.unlink(missing_ok=True)
-        index_file.write_text(REDIRECT_HTML.format(redirect))
+        # We replace it to handle the case when stable has joined the chat.
+        self.index_file.unlink(missing_ok=True)
+        self.index_file.write_text(REDIRECT_HTML.format(redirect))
 
     def _sphinx_build(self, dst_path):
         sphinx_build(dst_path, self.docs_path)

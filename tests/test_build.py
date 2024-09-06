@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from sphinx_ape.build import BuildMode, DocumentationBuilder
+from sphinx_ape.build import REDIRECT_HTML, BuildMode, DocumentationBuilder
 
 
 class TestBuildMode:
@@ -38,6 +38,10 @@ class TestDocumentationBuilder:
         builder.build()
         call_path = mock_sphinx.call_args[0][0]
         self.assert_build_path(call_path, "latest")
+        # Ensure re-direct exists and points to latest/.
+        assert builder.index_file.is_file()
+        expected_content = REDIRECT_HTML.format("latest")
+        assert builder.index_file.read_text() == expected_content
 
     def test_build_release(self, mock_sphinx, mock_git, temp_path):
         tag = "v1.0.0"
