@@ -29,4 +29,4 @@ jobs:
     - name: Ape Docs
       uses: ./
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
