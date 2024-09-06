@@ -138,7 +138,7 @@ def publish(base_path, repository, cicd, skip_add_commit_push):
     """
     Publish docs
     """
-    builder = _create_builder(mode=BuildMode.RELEASE, base_path=base_path)
+    builder = _create_builder(base_path=base_path)
     try:
         builder.publish(repository, cicd=cicd, git_acp=not skip_add_commit_push)
     except ApeDocsPublishError as err:

@@ -117,10 +117,6 @@ class DocumentationBuilder(Documentation):
             raise ApeDocsPublishError(str(err)) from err
 
     def _publish(self, repository: str, cicd: bool = False, git_acp=True):
-        if self.mode is not BuildMode.RELEASE:
-            # Nothing to do for "LATEST/"
-            return
-
         if cicd:
             # Must configure the email / username.
             git(
@@ -147,11 +143,17 @@ class DocumentationBuilder(Documentation):
             self._pages_branch_name,
         )
         try:
+            # Any built docs get added; the docs that got built are based on
+            # the mode parameter.
             for path in self.build_path.iterdir():
                 if not path.is_dir() or path.name.startswith(".") or path.name == "doctest":
                     continue
 
-                shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
+                elif path.name == "index.html":
+                    (gh_pages_path / "index.html").write_text(path.read_text())
+
+                else:
+                    shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
 
             os.chdir(str(gh_pages_path))
             no_jykell_file = Path(".nojekyll")
