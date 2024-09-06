@@ -1,9 +1,9 @@
+import ast
 import os
-import re
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import tomli
 
@@ -37,10 +37,62 @@ def sphinx_build(dst_path: Path, source_dir: Union[Path, str]) -> Path:
     return path
 
 
+def get_source_url(directory: Optional[Path] = None) -> str:
+    if env_var := os.getenv("GITHUB_REPO"):
+        return f"https://github.com/{env_var}"
+
+    return extract_source_url(directory=directory)
+
+
+def extract_source_url(directory: Optional[Path] = None) -> str:
+    directory = directory or Path.cwd()
+    url = None
+    if (directory / "setup.py").is_file():
+        url = _extract_github_url_from_setup_py(directory / "setup.py")
+    if url is None:
+        raise ApeDocsBuildError("No package source URL found.")
+
+    return url
+
+
+def _extract_github_url_from_setup_py(file_path: Path) -> Optional[str]:
+    # Check `project_urls`
+    project_urls: dict = _extract_key_from_setup_py("project_urls", file_path) or {}  # type: ignore
+    if url := project_urls.get("Source"):
+        return url
+
+    # Try url
+    url = _extract_key_from_setup_py("url", file_path)
+    if url and url.startswith("https://github.com"):
+        return url
+
+    return None
+
+
 def _extract_name_from_setup_py(file_path: Path) -> Optional[str]:
-    content = file_path.read_text()
-    if match := re.search(r"name\s*=\s*['\"](.+?)['\"]", content):
-        return match.group(1)
+    return _extract_key_from_setup_py("name", file_path)
+
+
+def _extract_key_from_setup_py(key: str, file_path: Path) -> Optional[Any]:
+    if not (setup_content := file_path.read_text()):
+        return None
+    elif not (parsed_content := ast.parse(setup_content)):
+        return None
+
+    # Walk through the AST to find the setup() call and extract the desired information
+    for node in ast.walk(parsed_content):
+        if (
+            not isinstance(node, ast.Call)
+            or not hasattr(node.func, "id")
+            or node.func.id != "setup"
+        ):
+            continue
+
+        for keyword in node.keywords:
+            if keyword.arg != key:
+                continue
+
+            return ast.literal_eval(keyword.value)
 
     return None
 

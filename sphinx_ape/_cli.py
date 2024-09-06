@@ -131,19 +131,19 @@ def test(base_path):
 
 @cli.command()
 @click.argument("base_path", type=Path)
-@click.argument("repository")
+@click.option("--repo", "--repository", help="Specify the repository ID")
 @click.option(
     "--skip-push",
     is_flag=True,
     hidden=True,
 )
-def publish(base_path, repository, cicd, skip_push):
+def publish(base_path, repository, skip_push):
     """
     Publish docs
     """
     builder = _create_builder(base_path=base_path)
     try:
-        builder.publish(repository, cicd=cicd, push=not skip_push)
+        builder.publish(repository=repository, push=not skip_push)
     except ApeDocsPublishError as err:
         click.echo(f"ERROR: {err}", err=True)
         sys.exit(1)

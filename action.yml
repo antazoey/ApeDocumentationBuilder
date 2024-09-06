@@ -41,8 +41,7 @@ runs:
     - name: Commit and publish documentation changes to gh-pages branch
       if:  ${{ github.event_name }} != "pull_request"
       run: |
-        # --skip-push assembles the build w/o pushing; for CI/CD.
-        sphinx-ape publish . ${{ github.repository }} --skip-push
+        sphinx-ape publish . --skip-push
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add .

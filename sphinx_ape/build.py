@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from sphinx_ape._base import Documentation
-from sphinx_ape._utils import git, replace_tree, sphinx_build
+from sphinx_ape._utils import extract_source_url, git, replace_tree, sphinx_build
 from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError
 
 REDIRECT_HTML = """
@@ -97,13 +97,14 @@ class DocumentationBuilder(Documentation):
 
         self._setup_redirect()
 
-    def publish(self, repository: str, push: bool = True):
+    def publish(self, repository: Optional[str] = None, push: bool = True):
         """
         Publish the documentation to GitHub pages.
         Meant to be run in CI/CD on releases.
 
         Args:
-            repository (str): The repository name.
+            repository (Optional[str]]): The repository name. Defaults to GitHub env-var
+              or extraction from setup file.
             push (bool): Set to ``False`` to skip git add, commit, and push.
 
         Raises:
@@ -111,15 +112,16 @@ class DocumentationBuilder(Documentation):
               publishing fails.
         """
         try:
-            self._publish(repository)
+            self._publish(repository=repository, push=push)
         except Exception as err:
             raise ApeDocsPublishError(str(err)) from err
 
-    def _publish(self, repository: str, push: bool = True):
-        if not repository:
-            raise ApeDocsPublishError("Missing 'repository' argument.")
+    def _publish(self, repository: Optional[str] = None, push: bool = True):
+        if repository:
+            repo_url = f"https://github.com/{repository}"
+        else:
+            repo_url = extract_source_url()
 
-        repo_url = f"https://github.com/{repository}"
         gh_pages_path = Path.cwd() / "gh-pages"
         git(
             "clone",
