@@ -28,5 +28,5 @@ jobs:
     # NOTE: This also serves as a test for the action.
     - name: Ape Docs
       uses: ./
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
