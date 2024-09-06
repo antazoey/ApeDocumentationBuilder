@@ -97,42 +97,29 @@ class DocumentationBuilder(Documentation):
 
         self._setup_redirect()
 
-    def publish(self, repository: str, cicd: bool = False):
+    def publish(self, repository: str, cicd: bool = False, git_acp: bool = True):
         """
         Publish the documentation to GitHub pages.
         Meant to be run in CI/CD on releases.
 
         Args:
-            repository (str): The repository name,
+            repository (str): The repository name.
             cicd (bool): The action sets this to ``True``.
+            git_acp (bool): Set to ``False`` to skip git add, commit, and push.
 
         Raises:
             :class:`~sphinx_ape.exceptions.ApeDocsPublishError`: When
               publishing fails.
         """
         try:
-            self._publish(repository, cicd=cicd)
+            self._publish(repository, cicd=cicd, git_acp=git_acp)
         except Exception as err:
             raise ApeDocsPublishError(str(err)) from err
 
-    def _publish(self, repository: str, cicd: bool = False):
+    def _publish(self, repository: str, cicd: bool = False, git_acp=True):
         if self.mode is not BuildMode.RELEASE:
             # Nothing to do for "LATEST/"
             return
-
-        repo_url = f"https://github.com/{repository}"
-        git(
-            "clone",
-            repo_url,
-            "--branch",
-            self._pages_branch_name,
-            "--single-branch",
-            self._pages_branch_name,
-        )
-        shutil.copytree(self.build_path, "gh-pages/")
-        os.chdir("gh-pages/")
-        no_jykell_file = Path(".nojekyll")
-        no_jykell_file.touch(exist_ok=True)
 
         if cicd:
             # Must configure the email / username.
@@ -149,8 +136,33 @@ class DocumentationBuilder(Documentation):
                 "GitHub Action",
             )
 
-        git("add", ".")
-        git("commit", "-m", "Update documentation", "-a")
+        repo_url = f"https://github.com/{repository}"
+        gh_pages_path = Path.cwd() / "gh-pages"
+        git(
+            "clone",
+            repo_url,
+            "--branch",
+            self._pages_branch_name,
+            "--single-branch",
+            self._pages_branch_name,
+        )
+        try:
+            for path in self.build_path.iterdir():
+                if not path.is_dir() or path.name.startswith(".") or path.name == "doctest":
+                    continue
+
+                shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
+
+            os.chdir(str(gh_pages_path))
+            no_jykell_file = Path(".nojekyll")
+            no_jykell_file.touch(exist_ok=True)
+            if git_acp:
+                git("add", ".")
+                git("commit", "-m", "Update documentation", "-a")
+                git("push")
+
+        finally:
+            shutil.rmtree(gh_pages_path, ignore_errors=True)
 
     def _build_release(self):
         if not (tag := git("describe", "--tag")):
