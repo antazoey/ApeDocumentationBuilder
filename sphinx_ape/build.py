@@ -20,7 +20,10 @@ class BuildMode(Enum):
     LATEST = 0
     """Build and then push to 'latest/'"""
 
-    RELEASE = 1
+    MERGE_TO_MAIN = 1
+    """Build and then push to 'stable/'"""
+
+    RELEASE = 2
     """Build and then push to 'stable/', 'latest/', and the version's release tag folder"""
 
     @classmethod
@@ -40,8 +43,13 @@ class BuildMode(Enum):
                 # Click being weird, value like "buildmode.release".
                 identifier = identifier.split(".")[-1].upper()
 
-            # GitHub event name.
-            return BuildMode.RELEASE if identifier.lower() == "release" else BuildMode.LATEST
+            identifier = identifier.lower()
+            if identifier == "release":
+                return BuildMode.RELEASE
+            elif identifier in ("push", "merge_to_main"):
+                return BuildMode.MERGE_TO_MAIN
+            else:
+                return BuildMode.LATEST
 
         # Unexpected.
         raise TypeError(identifier)
@@ -83,8 +91,9 @@ class DocumentationBuilder(Documentation):
               building fails.
         """
 
-        if self.mode is BuildMode.LATEST:
+        if self.mode in (BuildMode.LATEST, BuildMode.MERGE_TO_MAIN):
             # TRIGGER: Push to 'main' branch. Only builds latest.
+            #   And on PRs / local.
             self._sphinx_build(self.latest_path)
 
         elif self.mode is BuildMode.RELEASE:
@@ -122,7 +131,7 @@ class DocumentationBuilder(Documentation):
         else:
             repo_url = extract_source_url()
 
-        gh_pages_path = Path.cwd() / "gh-pages"
+        gh_pages_path = self._base_path / "gh-pages"
         git(
             "clone",
             repo_url,
@@ -135,14 +144,11 @@ class DocumentationBuilder(Documentation):
             # Any built docs get added; the docs that got built are based on
             # the mode parameter.
             for path in self.build_path.iterdir():
-                if not path.is_dir() or path.name.startswith(".") or path.name == "doctest":
-                    continue
-
-                elif path.name == "index.html":
-                    (gh_pages_path / "index.html").write_text(path.read_text())
-
-                else:
+                if path.is_dir() and not path.name.startswith(".") and path.name != "doctest":
                     shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
+                elif (path.name == "index.html") and path.is_file():
+                    gh_pages_path.mkdir(exist_ok=True)
+                    (gh_pages_path / "index.html").write_text(path.read_text())
 
             no_jykell_file = gh_pages_path / ".nojekyll"
             no_jykell_file.touch(exist_ok=True)
