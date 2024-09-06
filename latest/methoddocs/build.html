@@ -2,7 +2,7 @@
 <html lang="en" data-accent-color="lime" data-content_root="../">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Builder APIs - sphinx-ape documentation</title><link rel="shortcut icon" href="../_static/favicon.ico"/><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Exceptions" href="exceptions.html" /><link rel="prev" title="serve" href="../commands/serve.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Builder APIs - sphinx-ape documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Exceptions" href="exceptions.html" /><link rel="prev" title="serve" href="../commands/serve.html" />
       <link rel="canonical" href="sphinx-ape/methoddocs/build.html" /><script>
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
@@ -85,6 +85,7 @@ data-aria-dark="Switch to auto color mode">
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#sphinx_ape.build.BuildMode"><code class="docutils literal notranslate"><span class="pre">BuildMode</span></code></a><ul>
 <li><a class="reference internal" href="#sphinx_ape.build.BuildMode.LATEST"><code class="docutils literal notranslate">LATEST</span></code></a></li>
+<li><a class="reference internal" href="#sphinx_ape.build.BuildMode.MERGE_TO_MAIN"><code class="docutils literal notranslate">MERGE_TO_MAIN</span></code></a></li>
 <li><a class="reference internal" href="#sphinx_ape.build.BuildMode.RELEASE"><code class="docutils literal notranslate">RELEASE</span></code></a></li>
 </ul>
 </li>
@@ -126,16 +127,23 @@ data-aria-dark="Switch to auto color mode">
 <span id="builder-apis"></span><h1>Builder APIs<a class="headerlink" href="#module-sphinx_ape.build" title="Link to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="sphinx_ape.build.BuildMode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sphinx_ape.build.</span></span><span class="sig-name descname"><span class="pre">BuildMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sphinx_ape.build.BuildMode" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sphinx_ape.build.</span></span><span class="sig-name descname"><span class="pre">BuildMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sphinx_ape.build.BuildMode" title="Link to this definition"></a></dt>
+<dd><p>An enumeration.</p>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="sphinx_ape.build.BuildMode.LATEST">
 <span class="sig-name descname"><span class="pre">LATEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#sphinx_ape.build.BuildMode.LATEST" title="Link to this definition"></a></dt>
 <dd><p>Build and then push to ‘latest/’</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="sphinx_ape.build.BuildMode.MERGE_TO_MAIN">
+<span class="sig-name descname"><span class="pre">MERGE_TO_MAIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#sphinx_ape.build.BuildMode.MERGE_TO_MAIN" title="Link to this definition"></a></dt>
+<dd><p>Build and then push to ‘stable/’</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="sphinx_ape.build.BuildMode.RELEASE">
-<span class="sig-name descname"><span class="pre">RELEASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#sphinx_ape.build.BuildMode.RELEASE" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">RELEASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#sphinx_ape.build.BuildMode.RELEASE" title="Link to this definition"></a></dt>
 <dd><p>Build and then push to ‘stable/’, ‘latest/’, and the version’s release tag folder</p>
 </dd></dl>
 
@@ -171,14 +179,15 @@ documentation.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sphinx_ape.build.DocumentationBuilder.publish">
-<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cicd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sphinx_ape.build.DocumentationBuilder.publish" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repository</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">push</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sphinx_ape.build.DocumentationBuilder.publish" title="Link to this definition"></a></dt>
 <dd><p>Publish the documentation to GitHub pages.
 Meant to be run in CI/CD on releases.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>repository</strong> (<em>str</em>) – The repository name,</p></li>
-<li><p><strong>cicd</strong> (<em>bool</em>) – The action sets this to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>repository</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>]</em>) – The repository name. Defaults to GitHub env-var
+or extraction from setup file.</p></li>
+<li><p><strong>push</strong> (<em>bool</em>) – Set to <code class="docutils literal notranslate"><span class="pre">False</span></code> to skip git add, commit, and push.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
