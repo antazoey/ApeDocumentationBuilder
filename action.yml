@@ -55,4 +55,3 @@ runs:
         branch: gh-pages
         directory: gh-pages
         github_token: ${{ inputs.GITHUB_TOKEN }}
-      shell: bash
