@@ -10,10 +10,6 @@ inputs:
     description: 'Override version of python, defaults to 3.10'
     required: false
     default: '3.10'
-  package-name:
-    description: 'Override the package name, defaults to reading it from setup or pyproject file'
-    required: false
-    default: ''
 
 runs:
   using: 'composite'
@@ -31,7 +27,7 @@ runs:
 
     - name: Build Docs
       run: |
-        sphinx-ape build --mode "${{ github.event_name }}" ${{ inputs.package-name && '--name ' + inputs.package-name }} .
+        sphinx-ape build --mode "${{ github.event_name }}"
       shell: bash
 
     - name: Doctesting
