@@ -97,26 +97,25 @@ class DocumentationBuilder(Documentation):
 
         self._setup_redirect()
 
-    def publish(self, repository: str, cicd: bool = False, git_acp: bool = True):
+    def publish(self, repository: str, push: bool = True):
         """
         Publish the documentation to GitHub pages.
         Meant to be run in CI/CD on releases.
 
         Args:
             repository (str): The repository name.
-            cicd (bool): The action sets this to ``True``.
-            git_acp (bool): Set to ``False`` to skip git add, commit, and push.
+            push (bool): Set to ``False`` to skip git add, commit, and push.
 
         Raises:
             :class:`~sphinx_ape.exceptions.ApeDocsPublishError`: When
               publishing fails.
         """
         try:
-            self._publish(repository, cicd=cicd, git_acp=git_acp)
+            self._publish(repository)
         except Exception as err:
             raise ApeDocsPublishError(str(err)) from err
 
-    def _publish(self, repository: str, cicd: bool = False, git_acp=True):
+    def _publish(self, repository: str, push: bool = True):
         if not repository:
             raise ApeDocsPublishError("Missing 'repository' argument.")
 
@@ -143,32 +142,26 @@ class DocumentationBuilder(Documentation):
                 else:
                     shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
 
-            os.chdir(str(gh_pages_path))
-
-            if cicd:
-                # Must configure the email / username.
-                git(
-                    "config",
-                    "--local",
-                    "user.email",
-                    "action@github.com",
-                )
-                git(
-                    "config",
-                    "--local",
-                    "user.name",
-                    "GitHub Action",
-                )
-
-            no_jykell_file = Path(".nojekyll")
+            no_jykell_file = gh_pages_path / ".nojekyll"
             no_jykell_file.touch(exist_ok=True)
-            if git_acp:
-                git("add", ".")
-                git("commit", "-m", "Update documentation", "-a")
-                git("push", "origin", "gh-pages")
+
+            if push:
+                here = os.getcwd()
+                try:
+                    os.chdir(str(gh_pages_path))
+                    # NOTE: CI/CD does not push here but instead uses the
+                    #  push-action w/ a login.
+                    git("add", ".")
+                    git("commit", "-m", "Update documentation", "-a")
+                    git("push", "origin", "gh-pages")
+                finally:
+                    os.chdir(here)
 
         finally:
-            shutil.rmtree(gh_pages_path, ignore_errors=True)
+            if push:
+                # Only delete if we are done pushing.
+                # Else, leave so the GH action can push.
+                shutil.rmtree(gh_pages_path, ignore_errors=True)
 
     def _build_release(self):
         if not (tag := git("describe", "--tag")):

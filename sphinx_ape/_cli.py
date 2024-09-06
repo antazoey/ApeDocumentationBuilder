@@ -132,15 +132,18 @@ def test(base_path):
 @cli.command()
 @click.argument("base_path", type=Path)
 @click.argument("repository")
-@click.option("--cicd", is_flag=True, hidden=True)
-@click.option("--skip-add-commit-push", is_flag=True, hidden=True)
-def publish(base_path, repository, cicd, skip_add_commit_push):
+@click.option(
+    "--skip-push",
+    is_flag=True,
+    hidden=True,
+)
+def publish(base_path, repository, cicd, skip_push):
     """
     Publish docs
     """
     builder = _create_builder(base_path=base_path)
     try:
-        builder.publish(repository, cicd=cicd, git_acp=not skip_add_commit_push)
+        builder.publish(repository, cicd=cicd, push=not skip_push)
     except ApeDocsPublishError as err:
         click.echo(f"ERROR: {err}", err=True)
         sys.exit(1)
