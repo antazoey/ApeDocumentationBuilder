@@ -67,4 +67,5 @@ runs:
       with:
         branch: gh-pages
         directory: gh-pages
-        github_token: ${{ inputs.GITHUB_TOKEN }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
