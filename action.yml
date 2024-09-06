@@ -30,7 +30,7 @@ runs:
 
     - name: Build Docs
       run: |
-        sphinx-ape build --mode "${{ github.event_name }}"
+        sphinx-ape build --mode "${{ github.event_name }}" .
       shell: bash
 
     - name: Doctesting
