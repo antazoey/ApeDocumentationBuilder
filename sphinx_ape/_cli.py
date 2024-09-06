@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from pathlib import Path
 
 import click
@@ -18,7 +19,7 @@ def cli():
 def build_mode_option():
     return click.option(
         "--mode",
-        callback=lambda c, p, v: BuildMode(v),
+        callback=lambda c, p, v: BuildMode.init(v),
         default=BuildMode.LATEST,
     )
 
@@ -38,7 +39,7 @@ def init(base_path):
     Initialize documentation structure
     """
     # For this command, force the user to be in that dir.
-    builder = DocumentationBuilder(base_path=base_path)
+    builder = _create_builder(base_path=base_path)
     builder.init()
 
 
@@ -50,15 +51,16 @@ def build(base_path, mode, package_name):
     """
     Build an Ape python package's documentation
     """
-    click.echo(f"Building '{package_name}' '{mode.name}'.")
-    builder = DocumentationBuilder(mode, base_path=base_path, name=package_name)
+    builder = _create_builder(mode=mode, base_path=base_path, name=package_name)
 
     # Ensure all the files that need to exist do exist.
     builder.init()
 
     if not builder.docs_path.is_dir():
-        click.echo("docs/ folder missing. Try running:\n\tsphinx-ape init")
+        click.echo("docs/ folder missing. Try running:\n\tsphinx-ape init", err=True)
+        sys.exit(1)
 
+    click.echo(f"Building '{package_name}' '{mode.name}'.")
     try:
         builder.build()
     except ApeDocsBuildError as err:
@@ -107,3 +109,8 @@ def serve(base_path, host, port, open):
 
     except Exception as e:
         click.echo(f"An error occurred: {e}", err=True)
+
+
+def _create_builder(*args, **kwargs) -> DocumentationBuilder:
+    # Abstracted for testing purposes.
+    return DocumentationBuilder(*args, **kwargs)
