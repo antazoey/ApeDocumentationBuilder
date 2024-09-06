@@ -27,10 +27,12 @@ runs:
       run: |
         python -m pip install --upgrade pip
         pip install .
+      shell: bash
 
     - name: Build Docs
       run: |
         sphinx-ape build --mode "${{ github.event_name }}" ${{ inputs.package-name && '--name ' + inputs.package-name }} .
+      shell: bash
 
     - name: Doctesting
       run: |
@@ -42,6 +44,7 @@ runs:
           cat docs/_build/doctest/output.txt
           exit 1
         fi
+      shell: bash
 
     - name: Commit and publish documentation changes to gh-pages branch
       run: |
@@ -57,6 +60,7 @@ runs:
           git add .
           git commit -m "Update documentation" -a || true
         fi
+      shell: bash
 
     - name: Push changes
       uses: ad-m/github-push-action@master
