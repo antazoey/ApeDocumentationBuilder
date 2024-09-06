@@ -39,6 +39,7 @@ runs:
       shell: bash
 
     - name: Commit and publish documentation changes to gh-pages branch
+      if:  ${{ github.event_name }} != "pull_request"
       run: |
         sphinx-ape publish . ${{ github.repository }} --cicd
       shell: bash
