@@ -63,6 +63,12 @@ To automatically open a browser at the same time as serving, use the `--open` fl
 sphinx-ape serve . --open
 ```
 
+To run your doc-tests, use the `sphinx-ape test` command:
+
+```sh
+sphinx-ape test .
+```
+
 ## GitHub Action
 
 This GitHub action is meant for building the documentation in both core Ape as well any Ape plugin.
@@ -84,6 +90,12 @@ To set up this action with GitHub pages for the release-workflow to work, first 
 Then, delete everything besides a simple `README.md`, the `.gitignore` file, and the `LICENSE` file.
 Once that is all pushed, verify on the Pages tab that a site was made for you.
 Now, on merges to main and releases, this site should be updated (if you are using the action).
+
+To publish the docs locally, use the `publish` command:
+
+```sh
+sphinx-ape publish .
+```
 
 ## Development
 

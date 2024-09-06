@@ -30,7 +30,7 @@ runs:
 
     - name: Build Docs
       run: |
-        sphinx-ape build --mode "${{ github.event_name }}" .
+        sphinx-ape build . --mode "${{ github.event_name }}"
       shell: bash
 
     - name: Doctesting
@@ -39,15 +39,7 @@ runs:
       shell: bash
 
     - name: Commit and publish documentation changes to gh-pages branch
-      if: github.event_name == 'release' && github.event.action == 'published'
+      if:  ${{ github.event_name }} != "pull_request"
       run: |
         sphinx-ape publish . ${{ github.repository }} --cicd
       shell: bash
-
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      if: ${{ github.event_name != 'pull_request' }}
-      with:
-        branch: gh-pages
-        directory: gh-pages
-        github_token: ${{ inputs.github-token }}
