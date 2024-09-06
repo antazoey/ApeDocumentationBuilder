@@ -96,7 +96,9 @@ def serve(base_path, host, port, open):
         if open:
             url = f"http://{host}:{port}/"
             built_docs = [
-                b.name for b in build_path.iterdir() if b.is_dir() and not b.name.startswith(".")
+                b.name
+                for b in build_path.iterdir()
+                if b.is_dir() and not b.name.startswith(".") and b.name != "doctest"
             ]
             if len(built_docs) == 1:
                 # Only one package, dir-listing not necessary.
