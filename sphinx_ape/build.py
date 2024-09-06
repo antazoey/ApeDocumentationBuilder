@@ -117,21 +117,6 @@ class DocumentationBuilder(Documentation):
             raise ApeDocsPublishError(str(err)) from err
 
     def _publish(self, repository: str, cicd: bool = False, git_acp=True):
-        if cicd:
-            # Must configure the email / username.
-            git(
-                "config",
-                "--local",
-                "user.email",
-                "action@github.com",
-            )
-            git(
-                "config",
-                "--local",
-                "user.name",
-                "GitHub Action",
-            )
-
         repo_url = f"https://github.com/{repository}"
         gh_pages_path = Path.cwd() / "gh-pages"
         git(
@@ -156,6 +141,22 @@ class DocumentationBuilder(Documentation):
                     shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
 
             os.chdir(str(gh_pages_path))
+
+            if cicd:
+                # Must configure the email / username.
+                git(
+                    "config",
+                    "--local",
+                    "user.email",
+                    "action@github.com",
+                )
+                git(
+                    "config",
+                    "--local",
+                    "user.name",
+                    "GitHub Action",
+                )
+
             no_jykell_file = Path(".nojekyll")
             no_jykell_file.touch(exist_ok=True)
             if git_acp:
