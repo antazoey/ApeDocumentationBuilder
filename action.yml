@@ -54,4 +54,4 @@ runs:
       with:
         branch: gh-pages
         directory: gh-pages
-        github_token: ${{ inputs.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github-token }}
