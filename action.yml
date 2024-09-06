@@ -41,7 +41,7 @@ runs:
     - name: Commit and publish documentation changes to gh-pages branch
       if: github.event_name == 'release' && github.event.action == 'published'
       run: |
-        sphinx-ape publish . --repo ${{ github.repository }}
+        sphinx-ape publish . ${{ github.repository }}
       shell: bash
 
     - name: Push changes
