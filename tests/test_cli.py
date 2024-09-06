@@ -41,3 +41,8 @@ def test_build_from_pr(runner, cli):
     result = runner.invoke(cli, ("build", ".", "--mode", "pull_request"))
     assert result.exit_code == 0
     assert "Building 'sphinx-ape' 'LATEST'" in result.output
+
+
+def test_publish(runner, cli):
+    result = runner.invoke(cli, ("publish", ".", "--skip-push"))
+    assert result.exit_code == 0
