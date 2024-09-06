@@ -165,7 +165,7 @@ class DocumentationBuilder(Documentation):
             if git_acp:
                 git("add", ".")
                 git("commit", "-m", "Update documentation", "-a")
-                git("push")
+                git("push", "origin", "gh-pages")
 
         finally:
             shutil.rmtree(gh_pages_path, ignore_errors=True)
