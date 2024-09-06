@@ -137,7 +137,7 @@ def publish(base_path, repository, cicd):
     """
     Publish docs
     """
-    builder = _create_builder(base_path=base_path)
+    builder = _create_builder(mode=BuildMode.RELEASE, base_path=base_path)
     try:
         builder.publish(repository, cicd=cicd)
     except ApeDocsPublishError as err:
