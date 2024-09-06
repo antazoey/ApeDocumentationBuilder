@@ -132,13 +132,14 @@ def test(base_path):
 @cli.command()
 @click.argument("base_path", type=Path)
 @click.argument("repository")
-def publish(base_path, repository):
+@click.option("--cicd", is_flag=True)
+def publish(base_path, repository, cicd):
     """
     Publish docs
     """
     builder = _create_builder(base_path=base_path)
     try:
-        builder.publish(repository)
+        builder.publish(repository, cicd=cicd)
     except ApeDocsPublishError as err:
         click.echo(f"ERROR: {err}", err=True)
         sys.exit(1)

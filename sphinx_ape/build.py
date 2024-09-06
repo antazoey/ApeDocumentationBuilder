@@ -97,24 +97,25 @@ class DocumentationBuilder(Documentation):
 
         self._setup_redirect()
 
-    def publish(self, repository: str):
+    def publish(self, repository: str, cicd: bool = False):
         """
         Publish the documentation to GitHub pages.
         Meant to be run in CI/CD on releases.
+
+        Args:
+            repository (str): The repository name,
+            cicd (bool): The action sets this to ``True``.
 
         Raises:
             :class:`~sphinx_ape.exceptions.ApeDocsPublishError`: When
               publishing fails.
         """
         try:
-            self._publish(repository)
+            self._publish(repository, cicd=cicd)
         except Exception as err:
             raise ApeDocsPublishError(str(err)) from err
 
-    def _publish(self, repository: str):
-        """
-        Publish the documentation to GitHub pages.
-        """
+    def _publish(self, repository: str, cicd: bool = False):
         if self.mode is not BuildMode.RELEASE:
             # Nothing to do for "LATEST/"
             return
@@ -132,18 +133,22 @@ class DocumentationBuilder(Documentation):
         os.chdir("gh-pages/")
         no_jykell_file = Path(".nojekyll")
         no_jykell_file.touch(exist_ok=True)
-        git(
-            "config",
-            "--local",
-            "user.email",
-            "action@github.com",
-        )
-        git(
-            "config",
-            "--local",
-            "user.name",
-            "GitHub Action",
-        )
+
+        if cicd:
+            # Must configure the email / username.
+            git(
+                "config",
+                "--local",
+                "user.email",
+                "action@github.com",
+            )
+            git(
+                "config",
+                "--local",
+                "user.name",
+                "GitHub Action",
+            )
+
         git("add", ".")
         git("commit", "-m", "Update documentation", "-a")
 
