@@ -34,6 +34,10 @@ class BuildMode(Enum):
             return BuildMode(identifier)
 
         elif isinstance(identifier, str):
+            if "." in identifier:
+                # Click being weird, value like "buildmode.release".
+                identifier = identifier.split(".")[-1].upper()
+
             # GitHub event name.
             return BuildMode.RELEASE if identifier.lower() == "release" else BuildMode.LATEST
 
@@ -104,7 +108,7 @@ class DocumentationBuilder:
 
         elif self.mode is BuildMode.RELEASE:
             # TRIGGER: Release on GitHub
-            self.build_release()
+            self._build_release()
 
         else:
             # Unknown 'mode'.
@@ -112,7 +116,7 @@ class DocumentationBuilder:
 
         self._setup_redirect()
 
-    def build_release(self):
+    def _build_release(self):
         if not (tag := git("describe", "--tag")):
             raise ApeDocsBuildError("Unable to find release tag.")
 
@@ -126,6 +130,9 @@ class DocumentationBuilder:
             # Use the tag to create a new release folder.
             build_dir = self.build_path / tag
             self._sphinx_build(build_dir)
+
+            if not build_dir.is_dir():
+                return
 
             # Clean-up unnecessary extra 'fonts/' directories to save space.
             # There should still be one in 'latest/'

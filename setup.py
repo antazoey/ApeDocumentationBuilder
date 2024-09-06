@@ -2,6 +2,10 @@
 from setuptools import find_packages, setup
 
 extras_require = {
+    "test": [
+        "pytest>=8.3.2,<9",
+        "pytest-mock>=3.14.0,<4",
+    ],
     "lint": [
         "black>=24.4.2,<25",  # Auto-formatter and linter
         "mypy>=1.10.0,<2",  # Static type analyzer
@@ -31,7 +35,12 @@ extras_require = {
 }
 
 # NOTE: `pip install -e .[dev]` to install package
-extras_require["dev"] = extras_require["lint"] + extras_require["release"] + extras_require["dev"]
+extras_require["dev"] = (
+    extras_require["lint"]
+    + extras_require["release"]
+    + extras_require["test"]
+    + extras_require["dev"]
+)
 
 with open("./README.md") as readme:
     long_description = readme.read()

@@ -18,8 +18,7 @@ def cli():
 def build_mode_option():
     return click.option(
         "--mode",
-        callback=lambda c, p, v: BuildMode.init(v),
-        type=BuildMode,
+        callback=lambda c, p, v: BuildMode(v),
         default=BuildMode.LATEST,
     )
 
