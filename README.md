@@ -78,6 +78,10 @@ There are three GitHub events that trigger this action:
 
 3. Pull requests or local development: We ensure a successful build.
 
+## GitHub Pages
+
+To set up this action with GitHub pages for the release-workflow to work, first create a branch named `gh-pages` and push it to GitHub.
+
 ## Development
 
 Please see the [contributing guide](CONTRIBUTING.md) to learn more how to contribute to this project.
