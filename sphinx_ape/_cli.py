@@ -4,9 +4,10 @@ from pathlib import Path
 
 import click
 
+from sphinx_ape._utils import get_package_name
 from sphinx_ape.build import BuildMode, DocumentationBuilder
-from sphinx_ape.exceptions import ApeDocsBuildError
-from sphinx_ape.utils import get_package_name
+from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError, ApeDocsTestError
+from sphinx_ape.testing import DocumentationTester
 
 
 @click.group()
@@ -65,6 +66,7 @@ def build(base_path, mode, package_name):
         builder.build()
     except ApeDocsBuildError as err:
         click.echo(f"ERROR: {err}", err=True)
+        sys.exit(1)
 
 
 @cli.command()
@@ -111,6 +113,40 @@ def serve(base_path, host, port, open):
         click.echo(f"An error occurred: {e}", err=True)
 
 
+@cli.command()
+@click.argument("base_path", type=Path)
+def test(base_path):
+    """
+    Run doc-tests
+    """
+    tester = _create_tester(base_path=base_path)
+    try:
+        tester.test()
+    except ApeDocsTestError as err:
+        click.echo(f"ERROR: {err}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
+@click.argument("base_path", type=Path)
+@click.argument("repository")
+def publish(base_path, repository):
+    """
+    Publish docs
+    """
+    builder = _create_builder(base_path=base_path)
+    try:
+        builder.publish(repository)
+    except ApeDocsPublishError as err:
+        click.echo(f"ERROR: {err}", err=True)
+        sys.exit(1)
+
+
 def _create_builder(*args, **kwargs) -> DocumentationBuilder:
     # Abstracted for testing purposes.
     return DocumentationBuilder(*args, **kwargs)
+
+
+def _create_tester(*args, **kwargs) -> DocumentationTester:
+    # Abstracted for testing purposes.
+    return DocumentationTester(*args, **kwargs)

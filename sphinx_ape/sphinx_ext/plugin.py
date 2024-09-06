@@ -5,8 +5,8 @@ from pathlib import Path
 from sphinx.application import Sphinx
 from sphinx.util import logging
 
+from sphinx_ape._utils import get_package_name
 from sphinx_ape.sphinx_ext.directives import DynamicTocTree
-from sphinx_ape.utils import get_package_name
 
 logger = logging.getLogger(__name__)
 

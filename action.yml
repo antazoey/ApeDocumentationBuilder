@@ -35,31 +35,13 @@ runs:
 
     - name: Doctesting
       run: |
-        sphinx-build -b doctest docs docs/_build/doctest
-        # Check if there are no failures or no tests were run
-        if grep -qE '(0 failed|0 tests)' docs/_build/doctest/output.txt; then
-          echo "All doctests passed, or no doctests were run!"
-        else
-          echo "Some doctests failed. See the output below."
-          cat docs/_build/doctest/output.txt
-          exit 1
-        fi
+        sphinx-ape test .
       shell: bash
 
     - name: Commit and publish documentation changes to gh-pages branch
+      if: github.event_name == 'release' && github.event.action == 'published'
       run: |
-        if [[ "${{ github.event_name }}" =~ "pull_request" ]]; then
-          echo "skipping 'git commit' step for PR"
-        else
-          git clone https://github.com/${{ github.repository }} --branch gh-pages --single-branch gh-pages
-          cp -r docs/_build/ape/* gh-pages/
-          cd gh-pages
-          touch .nojekyll
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add .
-          git commit -m "Update documentation" -a || true
-        fi
+        sphinx-ape publish . --repo ${{ github.repository }}
       shell: bash
 
     - name: Push changes
