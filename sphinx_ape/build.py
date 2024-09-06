@@ -117,6 +117,9 @@ class DocumentationBuilder(Documentation):
             raise ApeDocsPublishError(str(err)) from err
 
     def _publish(self, repository: str, cicd: bool = False, git_acp=True):
+        if not repository:
+            raise ApeDocsPublishError("Missing 'repository' argument.")
+
         repo_url = f"https://github.com/{repository}"
         gh_pages_path = Path.cwd() / "gh-pages"
         git(
