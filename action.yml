@@ -1,6 +1,6 @@
 name: 'sphinx-ape-action'
 author: 'ApeWorX Ltd.'
-description: 'Build Ape or plugins documentation'
+description: 'Build documentation for Ape-like packages'
 branding:
   icon: 'book'
   color: 'green'
@@ -44,6 +44,7 @@ runs:
         sphinx-ape publish . --skip-push
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        cd gh-pages
         git add .
         git commit -m "Update documentation" -a || true
       shell: bash

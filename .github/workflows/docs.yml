@@ -26,7 +26,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     # NOTE: This also serves as a test for the action.
-    - name: Ape Docs
+    - name: Docs
       uses: ./
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
