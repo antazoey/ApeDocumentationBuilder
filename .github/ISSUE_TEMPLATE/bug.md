@@ -1,23 +1,13 @@
 ---
 name: Bug report
 about: Report an error that you've encountered.
-labels: bug
+labels: 'category: bug'
 ---
 
 ### Environment information
 
-- `ape` and plugin versions:
-
-```
-$ ape --version
-# ...copy and paste result of above command here...
-
-$ ape plugins list
-# ...copy and paste result of above command here...
-```
-
+- OS: macOS / linux / win
 - Python Version: x.x.x
-- OS: osx/linux/win
 
 ### What went wrong?
 

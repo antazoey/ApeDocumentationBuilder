@@ -1,0 +1,71 @@
+name: 'sphinx-ape-action'
+author: 'ApeWorX Ltd.'
+description: 'Build Ape or plugins documentation'
+branding:
+  icon: 'book'
+  color: 'green'
+
+inputs:
+  python-version:
+    description: 'Override version of python, defaults to 3.10'
+    required: false
+    default: '3.10'
+  github-token:
+    description: 'Token for pushing to GitHub'
+    required: false
+    default: '3.10'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install
+      run: |
+        pip install git+https://github.com/antazoey/sphinx-ape.git@feat/actionable
+      shell: bash
+
+    - name: Build Docs
+      run: |
+        sphinx-ape build --mode "${{ github.event_name }}" .
+      shell: bash
+
+    - name: Doctesting
+      run: |
+        sphinx-build -b doctest docs docs/_build/doctest
+        # Check if there are no failures or no tests were run
+        if grep -qE '(0 failed|0 tests)' docs/_build/doctest/output.txt; then
+          echo "All doctests passed, or no doctests were run!"
+        else
+          echo "Some doctests failed. See the output below."
+          cat docs/_build/doctest/output.txt
+          exit 1
+        fi
+      shell: bash
+
+    - name: Commit and publish documentation changes to gh-pages branch
+      run: |
+        if [[ "${{ github.event_name }}" =~ "pull_request" ]]; then
+          echo "skipping 'git commit' step for PR"
+        else
+          git clone https://github.com/${{ github.repository }} --branch gh-pages --single-branch gh-pages
+          cp -r docs/_build/ape/* gh-pages/
+          cd gh-pages
+          touch .nojekyll
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update documentation" -a || true
+        fi
+      shell: bash
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      if: ${{ github.event_name != 'pull_request' }}
+      with:
+        branch: gh-pages
+        directory: gh-pages
+        github_token: ${{ inputs.github-token }}

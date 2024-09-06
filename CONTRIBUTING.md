@@ -4,14 +4,14 @@ To get started with working on the codebase, use the following steps prepare you
 
 ```bash
 # clone the github repo and navigate into the folder
-git clone https://github.com/ApeWorX/docs-build.git
-cd docs-build
+git clone https://github.com/ApeWorX/sphinx-ape.git
+cd sphinx-ape
 
 # create and load a virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
-# install <PROJECT_NAME> into the virtual environment
+# install sphinx-ape into the virtual environment
 python setup.py install
 
 # install the developer dependencies (-e is interactive mode)
@@ -31,6 +31,22 @@ pre-commit install
 ```
 
 Committing will now automatically run the local hooks and ensure that your commit passes all lint checks.
+
+## Running the docs locally
+
+The documentation for this package is built using the tools from this package.
+Follow the README.md to learn how to install and use this tool.
+Then, from the root of this repository, run:
+
+```bash
+sphinx-ape build .
+```
+
+Then, to view the results, run:
+
+```bash
+sphinx-ape serve . --open
+```
 
 ## Pull Requests
 
