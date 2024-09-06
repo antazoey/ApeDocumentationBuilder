@@ -10,6 +10,10 @@ inputs:
     description: 'Override version of python, defaults to 3.10'
     required: false
     default: '3.10'
+  github-token:
+    description: 'Token for pushing to GitHub'
+    required: false
+    default: '3.10'
 
 runs:
   using: 'composite'
@@ -64,4 +68,4 @@ runs:
       with:
         branch: gh-pages
         directory: gh-pages
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.GITHUB_TOKEN }}
