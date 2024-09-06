@@ -2,19 +2,31 @@ from pathlib import Path
 
 import pytest
 
-from sphinx_ape.build import BuildMode, DocumentationBuilder
+from sphinx_ape.build import REDIRECT_HTML, BuildMode, DocumentationBuilder
 
 
 class TestBuildMode:
     @pytest.mark.parametrize("val", ("latest", 0, "pull_request", "buildmode.latest"))
     def test_init_latest(self, val):
-        mode = BuildMode.init("val")
+        mode = BuildMode.init(val)
         assert mode is BuildMode.LATEST
 
-    @pytest.mark.parametrize("val", ("release", 1, "buildmode.release"))
+    @pytest.mark.parametrize("val", ("merge_to_main", 1, "push", "buildmode.merge_to_main"))
+    def test_init_merge_to_main(self, val):
+        mode = BuildMode.init(val)
+        assert mode is BuildMode.MERGE_TO_MAIN, val
+
+    @pytest.mark.parametrize("val", ("release", 2, "buildmode.release"))
     def test_init_release(self, val):
         mode = BuildMode.init(val)
         assert mode is BuildMode.RELEASE
+
+
+def assert_build_path(path: Path, expected: str):
+    assert path.name == expected  # Tag, latest, or stable
+    assert path.parent.name == "sphinx-ape"  # Project name, happens to be this lib
+    assert path.parent.parent.name == "_build"  # Sphinx-ism
+    assert path.parent.parent.parent.name == "docs"  # Sphinx-ism
 
 
 class TestDocumentationBuilder:
@@ -37,7 +49,11 @@ class TestDocumentationBuilder:
         builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
         builder.build()
         call_path = mock_sphinx.call_args[0][0]
-        self.assert_build_path(call_path, "latest")
+        assert_build_path(call_path, "latest")
+        # Ensure re-direct exists and points to latest/.
+        assert builder.index_file.is_file()
+        expected_content = REDIRECT_HTML.format("latest")
+        assert builder.index_file.read_text() == expected_content
 
     def test_build_release(self, mock_sphinx, mock_git, temp_path):
         tag = "v1.0.0"
@@ -45,10 +61,14 @@ class TestDocumentationBuilder:
         builder = DocumentationBuilder(mode=BuildMode.RELEASE, base_path=temp_path)
         builder.build()
         call_path = mock_sphinx.call_args[0][0]
-        self.assert_build_path(call_path, tag)
+        assert_build_path(call_path, tag)
         # Latest and Stable should also have been created!
-        self.assert_build_path(call_path.parent / "latest", "latest")
-        self.assert_build_path(call_path.parent / "stable", "stable")
+        assert_build_path(call_path.parent / "latest", "latest")
+        assert_build_path(call_path.parent / "stable", "stable")
+        # Ensure re-direct exists and points to stable/.
+        assert builder.index_file.is_file()
+        expected_content = REDIRECT_HTML.format("stable")
+        assert builder.index_file.read_text() == expected_content
 
     @pytest.mark.parametrize("sub_tag", ("alpha", "beta"))
     def test_build_alpha_release(self, sub_tag, mock_sphinx, mock_git, temp_path):
@@ -61,12 +81,48 @@ class TestDocumentationBuilder:
         builder = DocumentationBuilder(mode=BuildMode.RELEASE, base_path=temp_path)
         builder.build()
         call_path = mock_sphinx.call_args[0][0]
-        self.assert_build_path(call_path, "stable")
+        assert_build_path(call_path, "stable")
         # Latest should also have been created!
-        self.assert_build_path(call_path.parent / "latest", "latest")
+        assert_build_path(call_path.parent / "latest", "latest")
 
-    def assert_build_path(self, path: Path, expected: str):
-        assert path.name == expected  # Tag, latest, or stable
-        assert path.parent.name == "sphinx-ape"  # Project name, happens to be this lib
-        assert path.parent.parent.name == "_build"  # Sphinx-ism
-        assert path.parent.parent.parent.name == "docs"  # Sphinx-ism
+    def test_publish_merge_to_main(self, temp_path, mock_git):
+        tag = "v1.0.0"
+        mock_git.return_value = tag
+        builder = DocumentationBuilder(mode=BuildMode.MERGE_TO_MAIN, base_path=temp_path)
+        # Ensure built first.
+        builder.build()
+        builder.publish(push=False)
+        gh_pages_path = temp_path / "gh-pages"
+        nojekyll_file = gh_pages_path / ".nojekyll"
+        stable_dir = gh_pages_path / "stable"
+        latest_dir = gh_pages_path / "latest"
+        tag_dir = gh_pages_path / tag
+        index_file = gh_pages_path / builder.index_file.name
+        assert gh_pages_path.is_dir()
+        assert nojekyll_file.is_file()
+        assert latest_dir.is_dir()
+        assert index_file.is_file()
+        # Not tag-release should have gotten created on merge-to-main.
+        assert not tag_dir.is_dir()
+        # Stable only gets built on releases.
+        assert not stable_dir.is_dir()
+
+    def test_publish_release(self, temp_path, mock_git):
+        tag = "v1.0.0"
+        mock_git.return_value = tag
+        builder = DocumentationBuilder(mode=BuildMode.RELEASE, base_path=temp_path)
+        # Ensure built first.
+        builder.build()
+        builder.publish(push=False)
+        gh_pages_path = temp_path / "gh-pages"
+        nojekyll_file = gh_pages_path / ".nojekyll"
+        stable_dir = gh_pages_path / "stable"
+        latest_dir = gh_pages_path / "latest"
+        tag_dir = gh_pages_path / tag
+        index_file = gh_pages_path / builder.index_file.name
+        assert gh_pages_path.is_dir()
+        assert nojekyll_file.is_file()
+        assert stable_dir.is_dir()
+        assert latest_dir.is_dir()
+        assert tag_dir.is_dir()
+        assert index_file.is_file()
