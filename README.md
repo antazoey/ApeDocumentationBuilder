@@ -81,6 +81,9 @@ There are three GitHub events that trigger this action:
 ## GitHub Pages
 
 To set up this action with GitHub pages for the release-workflow to work, first create a branch named `gh-pages` and push it to GitHub.
+Then, delete everything besides a simple `README.md`, the `.gitignore` file, and the `LICENSE` file.
+Once that is all pushed, verify on the Pages tab that a site was made for you.
+Now, on merges to main and releases, this site should be updated (if you are using the action).
 
 ## Development
 
