@@ -32,6 +32,22 @@ pre-commit install
 
 Committing will now automatically run the local hooks and ensure that your commit passes all lint checks.
 
+## Running the docs locally
+
+The documentation for this package is built using the tools from this package.
+Follow the README.md to learn how to install and use this tool.
+Then, from the root of this repository, run:
+
+```bash
+sphinx-ape build .
+```
+
+Then, to view the results, run:
+
+```bash
+sphinx-ape serve . --open
+```
+
 ## Pull Requests
 
 Pull requests are welcomed! Please adhere to the following:
