@@ -22,7 +22,7 @@ Try `sphinx-ape --help` to check if it's installed.
 To use this sphinx plugin, first generate the docs structure (ran from your project directory):
 
 ```sh
-sphinx-ape init
+sphinx-ape init .
 ```
 
 It will have generated a `docs/` folder with some necessary config file in it, along with a quick-start that links to your `README.md`.

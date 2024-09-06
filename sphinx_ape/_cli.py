@@ -34,12 +34,12 @@ def package_name_option():
 
 @cli.command()
 @click.argument("base_path", type=Path)
-def init():
+def init(base_path):
     """
     Initialize documentation structure
     """
     # For this command, force the user to be in that dir.
-    builder = DocumentationBuilder(base_path=Path.cwd())
+    builder = DocumentationBuilder(base_path=base_path)
     builder.init()
 
 
