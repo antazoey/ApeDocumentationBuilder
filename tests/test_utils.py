@@ -1,4 +1,4 @@
-from sphinx_ape.utils import extract_package_name
+from sphinx_ape._utils import extract_package_name
 
 
 def test_extract_package_name_setup_py(temp_path):

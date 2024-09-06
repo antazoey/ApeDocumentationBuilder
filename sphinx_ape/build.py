@@ -1,10 +1,12 @@
+import os
 import shutil
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Union
 
-from sphinx_ape.exceptions import ApeDocsBuildError
-from sphinx_ape.utils import get_package_name, git, replace_tree, sphinx_build
+from sphinx_ape._base import Documentation
+from sphinx_ape._utils import git, replace_tree, sphinx_build
+from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError
 
 REDIRECT_HTML = """
 <!DOCTYPE html>
@@ -45,7 +47,7 @@ class BuildMode(Enum):
         raise TypeError(identifier)
 
 
-class DocumentationBuilder:
+class DocumentationBuilder(Documentation):
     """
     Builds either "latest", or "stable" / "release"
     documentation.
@@ -56,52 +58,31 @@ class DocumentationBuilder:
         mode: Optional[BuildMode] = None,
         base_path: Optional[Path] = None,
         name: Optional[str] = None,
+        pages_branch_name: Optional[str] = None,
     ) -> None:
         self.mode = BuildMode.LATEST if mode is None else mode
-        self._base_path = base_path or Path.cwd()
-        self._name = name or get_package_name()
-
-    @property
-    def docs_path(self) -> Path:
-        return self._base_path / "docs"
-
-    @property
-    def build_path(self) -> Path:
-        return self.docs_path / "_build" / self._name
-
-    @property
-    def latest_path(self) -> Path:
-        return self.build_path / "latest"
-
-    @property
-    def stable_path(self) -> Path:
-        return self.build_path / "stable"
-
-    @property
-    def userguides_path(self) -> Path:
-        return self.docs_path / "userguides"
-
-    @property
-    def commands_path(self) -> Path:
-        return self.docs_path / "commands"
-
-    @property
-    def methoddocs_path(self) -> Path:
-        return self.docs_path / "methoddocs"
-
-    @property
-    def conf_file(self) -> Path:
-        return self.docs_path / "conf.py"
-
-    def init(self):
-        if not self.docs_path.is_dir():
-            self.docs_path.mkdir()
-
-        self._ensure_quickstart_exists()
-        self._ensure_conf_exists()
-        self._ensure_index_exists()
+        super().__init__(base_path, name)
+        self._pages_branch_name = pages_branch_name or "gh-pages"
 
     def build(self):
+        """
+        Build the documentation.
+
+        Example:
+            >>> from sphinx_ape.build import BuildMode, DocumentationBuilder
+            >>> from pathlib import Path
+            >>> builder = DocumentationBuilder(
+            ...   mode=BuildMode.LATEST,
+            ...   base_path=Path("."),
+            ...   name="sphinx-ape"
+            ... )
+            >>> builder.build()
+
+        Raises:
+            :class:`~sphinx_ape.exceptions.ApeDocsBuildError`: When
+              building fails.
+        """
+
         if self.mode is BuildMode.LATEST:
             # TRIGGER: Push to 'main' branch. Only builds latest.
             self._sphinx_build(self.latest_path)
@@ -115,6 +96,61 @@ class DocumentationBuilder:
             raise ApeDocsBuildError(f"Unsupported build-mode: {self.mode}")
 
         self._setup_redirect()
+
+    def publish(self, repository: str, cicd: bool = False):
+        """
+        Publish the documentation to GitHub pages.
+        Meant to be run in CI/CD on releases.
+
+        Args:
+            repository (str): The repository name,
+            cicd (bool): The action sets this to ``True``.
+
+        Raises:
+            :class:`~sphinx_ape.exceptions.ApeDocsPublishError`: When
+              publishing fails.
+        """
+        try:
+            self._publish(repository, cicd=cicd)
+        except Exception as err:
+            raise ApeDocsPublishError(str(err)) from err
+
+    def _publish(self, repository: str, cicd: bool = False):
+        if self.mode is not BuildMode.RELEASE:
+            # Nothing to do for "LATEST/"
+            return
+
+        repo_url = f"https://github.com/{repository}"
+        git(
+            "clone",
+            repo_url,
+            "--branch",
+            self._pages_branch_name,
+            "--single-branch",
+            self._pages_branch_name,
+        )
+        shutil.copytree(self.build_path, "gh-pages/")
+        os.chdir("gh-pages/")
+        no_jykell_file = Path(".nojekyll")
+        no_jykell_file.touch(exist_ok=True)
+
+        if cicd:
+            # Must configure the email / username.
+            git(
+                "config",
+                "--local",
+                "user.email",
+                "action@github.com",
+            )
+            git(
+                "config",
+                "--local",
+                "user.name",
+                "GitHub Action",
+            )
+
+        git("add", ".")
+        git("commit", "-m", "Update documentation", "-a")
 
     def _build_release(self):
         if not (tag := git("describe", "--tag")):
@@ -144,24 +180,6 @@ class DocumentationBuilder:
             for path in (self.stable_path, self.latest_path):
                 replace_tree(build_dir, path)
 
-    @property
-    def userguide_names(self) -> list[str]:
-        guides = self._get_filenames(self.userguides_path)
-        quickstart_name = "userguides/quickstart"
-        if quickstart_name in guides:
-            # Make sure quick start is first.
-            guides = [quickstart_name, *[g for g in guides if g != quickstart_name]]
-
-        return guides
-
-    @property
-    def cli_reference_names(self) -> list[str]:
-        return self._get_filenames(self.commands_path)
-
-    @property
-    def methoddoc_names(self) -> list[str]:
-        return self._get_filenames(self.methoddocs_path)
-
     def _setup_redirect(self):
         self.build_path.mkdir(exist_ok=True, parents=True)
 
@@ -175,33 +193,3 @@ class DocumentationBuilder:
 
     def _sphinx_build(self, dst_path):
         sphinx_build(dst_path, self.docs_path)
-
-    def _get_filenames(self, path: Path) -> list[str]:
-        if not path.is_dir():
-            return []
-
-        return sorted([g.stem for g in path.iterdir() if g.suffix in (".md", ".rst")])
-
-    def _ensure_conf_exists(self):
-        if self.conf_file.is_file():
-            return
-
-        content = 'extensions = ["sphinx_ape"]\n'
-        self.conf_file.write_text(content)
-
-    def _ensure_index_exists(self):
-        index_file = self.docs_path / "index.rst"
-        if index_file.is_file():
-            return
-
-        content = ".. dynamic-toc-tree::\n"
-        index_file.write_text(content)
-
-    def _ensure_quickstart_exists(self):
-        quickstart_path = self.userguides_path / "quickstart.md"
-        if quickstart_path.is_file():
-            # Already exists.
-            return
-
-        self.userguides_path.mkdir(exist_ok=True)
-        quickstart_path.write_text("```{include} ../../README.md\n```\n")
