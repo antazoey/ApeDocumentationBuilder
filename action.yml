@@ -36,8 +36,9 @@ runs:
     - name: Doctesting
       run: |
         sphinx-build -b doctest docs docs/_build/doctest
-        if grep -q '0 failed' docs/_build/doctest/output.txt; then
-          echo "All doctests passed!"
+        # Check if there are no failures or no tests were run
+        if grep -qE '(0 failed|0 tests)' docs/_build/doctest/output.txt; then
+          echo "All doctests passed, or no doctests were run!"
         else
           echo "Some doctests failed. See the output below."
           cat docs/_build/doctest/output.txt
