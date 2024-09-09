@@ -143,7 +143,12 @@ class DocumentationBuilder(Documentation):
             # the mode parameter.
             for path in self.build_path.iterdir():
                 if path.is_dir() and not path.name.startswith(".") and path.name != "doctest":
-                    shutil.copytree(path, gh_pages_path / path.name, dirs_exist_ok=True)
+                    dst_path = gh_pages_path / path.name
+                    if dst_path.is_dir():
+                        shutil.rmtree(dst_path)
+
+                    shutil.copytree(path, dst_path)
+
                 elif (path.name == "index.html") and path.is_file():
                     gh_pages_path.mkdir(exist_ok=True)
                     (gh_pages_path / "index.html").write_text(path.read_text())
@@ -204,5 +209,5 @@ class DocumentationBuilder(Documentation):
         self.index_file.unlink(missing_ok=True)
         self.index_file.write_text(REDIRECT_HTML.format(redirect))
 
-    def _sphinx_build(self, dst_path):
+    def _sphinx_build(self, dst_path: Path):
         sphinx_build(dst_path, self.docs_path)

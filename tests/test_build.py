@@ -94,16 +94,24 @@ class TestDocumentationBuilder:
         tag = "v1.0.0"
         mock_git.return_value = tag
         builder = DocumentationBuilder(mode=BuildMode.MERGE_TO_MAIN, base_path=temp_path)
-        builder.init()
-        # Ensure built first.
-        builder.build()
-        builder.publish(push=False)
         gh_pages_path = temp_path / "gh-pages"
         nojekyll_file = gh_pages_path / ".nojekyll"
         stable_dir = gh_pages_path / "stable"
         latest_dir = gh_pages_path / "latest"
         tag_dir = gh_pages_path / tag
         index_file = gh_pages_path / builder.index_file.name
+        static_dir = latest_dir / "_static"
+
+        # Create a random file in _static to show it doesn't matter.
+        static_dir.mkdir(exist_ok=True, parents=True)
+        random_file = static_dir / "randomfile.txt"
+        random_file.write_text("this should be fine.")
+
+        # Ensure built first.
+        builder.init()
+        builder.build()
+        builder.publish(push=False)
+
         assert gh_pages_path.is_dir()
         assert nojekyll_file.is_file()
         assert latest_dir.is_dir()
@@ -113,10 +121,10 @@ class TestDocumentationBuilder:
         # Stable only gets built on releases.
         assert not stable_dir.is_dir()
         # Ensure static content exists.
-        static_dir = latest_dir / "_static"
         assert static_dir.is_dir(), "Missing 'latest/_static'"
         logo = static_dir / "logo_green.svg"
         assert logo.is_file(), "Missing logo: 'latest/_static/logo_green.svg'"
+        assert not random_file.is_file()
 
     def test_publish_release(self, temp_path, mock_git):
         tag = "v1.0.0"
