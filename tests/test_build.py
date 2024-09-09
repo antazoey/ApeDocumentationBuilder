@@ -112,6 +112,11 @@ class TestDocumentationBuilder:
         assert not tag_dir.is_dir()
         # Stable only gets built on releases.
         assert not stable_dir.is_dir()
+        # Ensure static content exists.
+        static_dir = latest_dir / "_static"
+        assert static_dir.is_dir(), "Missing 'latest/_static'"
+        logo = static_dir / "logo_green.svg"
+        assert logo.is_file(), "Missing logo: 'latest/_static/logo_green.svg'"
 
     def test_publish_release(self, temp_path, mock_git):
         tag = "v1.0.0"
@@ -133,3 +138,9 @@ class TestDocumentationBuilder:
         assert latest_dir.is_dir()
         assert tag_dir.is_dir()
         assert index_file.is_file()
+        # Ensure static content exists.
+        for directory in (latest_dir, stable_dir, tag_dir):
+            static_dir = directory / "_static"
+            assert static_dir.is_dir(), f"Missing static: {directory.name}"
+            logo = static_dir / "logo_green.svg"
+            assert logo.is_file(), f"Missing logo: {directory.name}"
