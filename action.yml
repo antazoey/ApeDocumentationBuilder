@@ -25,7 +25,7 @@ runs:
 
     - name: Install
       run: |
-        pip install git+https://github.com/ApeWorX/sphinx-ape.git@main
+        pip install sphinx-ape
       shell: bash
 
     - name: Build Docs

@@ -11,11 +11,18 @@ class DocumentationTester(Documentation):
     """
 
     @property
+    def doctest_folder(self) -> Path:
+        """
+        The path to doctest's build folder.
+        """
+        return self.build_path.parent / "doctest"
+
+    @property
     def doctest_output_file(self) -> Path:
         """
         The path to doctest's output file.
         """
-        return self.build_path.parent / "doctest" / "output.txt"
+        return self.doctest_folder / "output.txt"
 
     def test(self):
         """
@@ -24,18 +31,19 @@ class DocumentationTester(Documentation):
         Raises:
             :class:`~sphinx_ape.exceptions.ApeDocsTestError`
         """
+        self._run_tests()
+        output = self.doctest_output_file.read_text() if self.doctest_output_file.is_file() else ""
+        if "0 failed" in output or "0 tests" in output:
+            # Either no failures or no tests ran.
+            return
+
+        # Failures.
+        raise ApeDocsTestError(output)
+
+    def _run_tests(self):
         try:
             subprocess.run(
-                ["sphinx-build", "-b", "doctest", "docs", "docs/_build/doctest"], check=True
+                ["sphinx-build", "-b", "doctest", "docs", str(self.doctest_folder)], check=True
             )
         except subprocess.CalledProcessError as err:
             raise ApeDocsBuildError(str(err)) from err
-
-        if self.doctest_output_file.is_file():
-            return
-
-        output = self.doctest_output_file.read_text() if self.doctest_output_file.is_file() else ""
-        if "0 failed" in output or "0 tests" in output:
-            return
-
-        raise ApeDocsTestError(output)
