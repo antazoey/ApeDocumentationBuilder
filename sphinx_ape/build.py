@@ -210,4 +210,5 @@ class DocumentationBuilder(Documentation):
         self.index_file.write_text(REDIRECT_HTML.format(redirect))
 
     def _sphinx_build(self, dst_path: Path):
+        shutil.rmtree(dst_path, ignore_errors=True)
         sphinx_build(dst_path, self.docs_path)
