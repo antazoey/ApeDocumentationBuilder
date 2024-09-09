@@ -30,7 +30,7 @@ def assert_build_path(path: Path, expected: str):
 
 
 class TestDocumentationBuilder:
-    @pytest.fixture(autouse=True)
+    @pytest.fixture
     def mock_sphinx(self, mocker):
         def run_mock_sphinx(path, *args, **kwargs):
             path.mkdir(parents=True)
@@ -45,15 +45,20 @@ class TestDocumentationBuilder:
     def mock_git(self, mocker):
         return mocker.patch("sphinx_ape.build.git")
 
-    def test_build_latest(self, mock_sphinx, temp_path):
+    def test_build_latest(self, temp_path):
         builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
+        builder.init()  # so there is something to build.
         builder.build()
-        call_path = mock_sphinx.call_args[0][0]
-        assert_build_path(call_path, "latest")
+        assert builder.latest_path.is_dir()
+
         # Ensure re-direct exists and points to latest/.
         assert builder.index_file.is_file()
         expected_content = REDIRECT_HTML.format("latest")
         assert builder.index_file.read_text() == expected_content
+
+        # Ensure static content exists.
+        assert (builder.latest_path / "_static").is_dir()
+        assert (builder.latest_path / "_static" / "logo_green.svg").is_file()
 
     def test_build_release(self, mock_sphinx, mock_git, temp_path):
         tag = "v1.0.0"
@@ -89,6 +94,7 @@ class TestDocumentationBuilder:
         tag = "v1.0.0"
         mock_git.return_value = tag
         builder = DocumentationBuilder(mode=BuildMode.MERGE_TO_MAIN, base_path=temp_path)
+        builder.init()
         # Ensure built first.
         builder.build()
         builder.publish(push=False)
@@ -111,6 +117,7 @@ class TestDocumentationBuilder:
         tag = "v1.0.0"
         mock_git.return_value = tag
         builder = DocumentationBuilder(mode=BuildMode.RELEASE, base_path=temp_path)
+        builder.init()
         # Ensure built first.
         builder.build()
         builder.publish(push=False)
