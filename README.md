@@ -9,11 +9,13 @@ The purpose of this plugin to share code for generating documentation across all
 
 ## Install
 
-Install using `pip` or `uv` by either cloning this repo or accessing from pypi, e.g.:
+Install the package from GitHub:
 
 ```sh
-pip install sphinx-ape
+pip install git+https://github.com/ApeWorX/sphinx-ape.git@main
 ```
+
+**NOTE**: Also, you may clone and the package first and install locally.
 
 Try `sphinx-ape --help` to check if it's installed.
 
