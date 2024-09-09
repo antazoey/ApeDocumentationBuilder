@@ -77,11 +77,9 @@ class DocumentationBuilder(Documentation):
         Build the documentation.
 
         Example:
-            >>> from sphinx_ape.build import BuildMode, DocumentationBuilder
-            >>> from pathlib import Path
             >>> builder = DocumentationBuilder(
             ...   mode=BuildMode.LATEST,
-            ...   base_path=Path("."),
+            ...   base_path=Path.cwd(),
             ...   name="sphinx-ape"
             ... )
             >>> builder.build()

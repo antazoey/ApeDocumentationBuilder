@@ -128,7 +128,8 @@ def extract_package_name(directory: Optional[Path] = None) -> str:
     if pkg_name is None and (directory / "pyproject.toml").is_file():
         pkg_name = _extract_name_from_pyproject_toml(directory / "pyproject.toml")
     if pkg_name is None:
-        raise ApeDocsBuildError("No package name found.")
+        path = f"{directory}".replace(f"{Path.home()}", "$HOME")
+        raise ApeDocsBuildError(f"No package name found at '{path}'.")
 
     return PACKAGE_ALIASES.get(pkg_name, pkg_name)
 
