@@ -74,7 +74,7 @@ sphinx-ape test .
 ## GitHub Action
 
 This GitHub action is meant for building the documentation in both core Ape as well any Ape plugin.
-The aciton may also work for regular Python packages with a documentation-strategy similar to Ape.
+The action may also work for regular Python packages with a documentation-strategy similar to Ape.
 
 There are three GitHub events that trigger this action:
 
