@@ -54,6 +54,10 @@ def setup(app: Sphinx):
 
     # Configure the HTML workings.
     static_dir = Path(__file__).parent.parent.parent / "_static"
+
+    # Logging to DEBUG problems when this doesn't work in CI/CD.
+    logger.info(f"STATIC DIRECTORY: {static_dir}")
+
     app.config.html_theme = "shibuya"
     app.config.html_favicon = str(static_dir / "favicon.ico")
     app.config.html_baseurl = package_name
