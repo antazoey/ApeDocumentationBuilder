@@ -53,10 +53,7 @@ def setup(app: Sphinx):
         app.config.plausible_domain = "docs.apeworx.io"
 
     # Configure the HTML workings.
-    static_dir = Path(__file__).parent.parent.parent / "_static"
-
-    # Logging to DEBUG problems when this doesn't work in CI/CD.
-    logger.info(f"STATIC DIRECTORY: {static_dir}")
+    static_dir = Path(__file__).parent.parent / "_static"
 
     app.config.html_theme = "shibuya"
     app.config.html_favicon = str(static_dir / "favicon.ico")

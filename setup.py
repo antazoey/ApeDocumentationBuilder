@@ -81,7 +81,7 @@ setup(
     zip_safe=False,
     keywords="ethereum",
     packages=find_packages(exclude=["tests", "tests.*"]),
-    package_data={"sphinx_ape": ["py.typed"]},
+    package_data={"sphinx_ape": ["py.typed", "_static/*"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
