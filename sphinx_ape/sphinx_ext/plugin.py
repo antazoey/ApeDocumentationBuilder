@@ -53,7 +53,8 @@ def setup(app: Sphinx):
         app.config.plausible_domain = "docs.apeworx.io"
 
     # Configure the HTML workings.
-    static_dir = Path(__file__).parent.parent.parent / "_static"
+    static_dir = Path(__file__).parent.parent / "_static"
+
     app.config.html_theme = "shibuya"
     app.config.html_favicon = str(static_dir / "favicon.ico")
     app.config.html_baseurl = package_name
