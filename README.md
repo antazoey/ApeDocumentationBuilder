@@ -71,6 +71,28 @@ To run your doc-tests, use the `sphinx-ape test` command:
 sphinx-ape test .
 ```
 
+## Auto-TOC Tree
+
+The `sphinx-ape init` command creates an `index.rst` file.
+This file represents the table of contents for the docs site.
+Any files not included in the TOC are not included in the documentation.
+`sphinx-ape` generates a simple default file with the contents:
+
+```rst
+.. dynamic-toc-tree::
+```
+
+To customize the files included in the TOC, specify each respective guide-set name (e.g. `userguides`).
+Also use this feature to control the ordering of the guides; otherwise the default is to include all guides in the directory in alphabetized order.
+
+```rst
+.. dynamic-toc-tree::
+  :userguides: guide0, guide1, final
+```
+
+**NOTE**: You do not need to specify the quickstart guide.
+If you are using the quickstart guide, it will automatically appear first in the list.
+
 ## GitHub Action
 
 This GitHub action is meant for building the documentation in both core Ape as well any Ape plugin.

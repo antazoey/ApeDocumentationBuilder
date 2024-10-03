@@ -12,7 +12,12 @@ class Documentation:
     project.
     """
 
-    def __init__(self, base_path: Optional[Path] = None, name: Optional[str] = None, toc_tree_spec: Optional[TOCTreeSpec] = None) -> None:
+    def __init__(
+        self,
+        base_path: Optional[Path] = None,
+        name: Optional[str] = None,
+        toc_tree_spec: Optional[TOCTreeSpec] = None,
+    ) -> None:
         self.base_path = base_path or Path.cwd()
         self._name = name or get_package_name()
         self._toc_tree_spec = toc_tree_spec or TOCTreeSpec()
@@ -171,13 +176,12 @@ class Documentation:
 
         filenames = [p.stem for p in path.iterdir() if _is_doc(p)]
         if spec := self._toc_tree_spec.get(path.name):
-            # Adhere to configured spec.
+            # Adhere to configured order and filtering.
             return [f for f in spec if f in filenames]
 
-        else:
-            # Default to a sorted order.
-            return sorted(filenames)
+        # Default to a sorted order.
+        return sorted(filenames)
 
 
-def _is_doc(self, path: Path) -> bool:
+def _is_doc(path: Path) -> bool:
     return path.suffix in (".md", ".rst")

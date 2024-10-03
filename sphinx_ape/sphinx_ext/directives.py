@@ -46,9 +46,9 @@ class DynamicTocTree(SphinxDirective):
     @property
     def toc_tree_spec(self) -> TOCTreeSpec:
         return TOCTreeSpec(
-            userguides=self.options.get("userguides"),
-            methoddocs=self.options.get("methoddocs"),
-            commands=self.options.get("commands"),
+            userguides=_parse_spec(self.options.get("userguides")),
+            methoddocs=_parse_spec(self.options.get("methoddocs")),
+            commands=_parse_spec(self.options.get("commands")),
         )
 
     @property
@@ -99,3 +99,10 @@ class DynamicTocTree(SphinxDirective):
 
     def _get_methoddocs(self) -> list[str]:
         return [f"methoddocs/{n}" for n in self.builder.methoddoc_names]
+
+
+def _parse_spec(value) -> list[str]:
+    if value is None:
+        return []
+
+    return [n.strip() for n in value.split(" ")]
