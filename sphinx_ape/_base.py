@@ -6,12 +6,20 @@ from sphinx_ape._utils import get_package_name
 
 
 class Documentation:
+    """
+    The base-documentation class for working with a sphinx-ape
+    project.
+    """
+
     def __init__(self, base_path: Optional[Path] = None, name: Optional[str] = None) -> None:
         self.base_path = base_path or Path.cwd()
         self._name = name or get_package_name()
 
     @property
     def docs_path(self) -> Path:
+        """
+        The root documentation folder.
+        """
         return self.base_path / "docs"
 
     @property
@@ -20,37 +28,68 @@ class Documentation:
 
     @property
     def build_path(self) -> Path:
+        """
+        The build location.
+        """
         return self.root_build_path / self._name
 
     @property
     def latest_path(self) -> Path:
+        """
+        The build location for ``latest/``.
+        """
         return self.build_path / "latest"
 
     @property
     def stable_path(self) -> Path:
+        """
+        The build location for ``stable/``.
+        """
         return self.build_path / "stable"
 
     @property
     def userguides_path(self) -> Path:
+        """
+        The path to the userguides.
+        """
         return self.docs_path / "userguides"
 
     @property
     def commands_path(self) -> Path:
+        """
+        The path to the generated  CLI documentation.
+        """
         return self.docs_path / "commands"
 
     @property
     def methoddocs_path(self) -> Path:
+        """
+        The path to the autodoc generated documentation.
+        """
         return self.docs_path / "methoddocs"
 
     @property
     def conf_file(self) -> Path:
+        """
+        The path to sphinx's ``conf.py`` file.
+        """
         return self.docs_path / "conf.py"
 
     @property
     def index_file(self) -> Path:
+        """
+        The path to the index HTML file.
+        """
         return self.build_path / "index.html"
 
     def init(self, include_quickstart: bool = True):
+        """
+        Initialize documentation structure.
+
+        Args:
+            include_quickstart (bool): Set to ``False`` to ignore
+              creating the quickstart guide. Defaults to ``True``.
+        """
         if not self.docs_path.is_dir():
             self.docs_path.mkdir()
 
@@ -86,6 +125,9 @@ class Documentation:
 
     @cached_property
     def quickstart_name(self) -> Optional[str]:
+        """
+        The name of the quickstart guide, if it exists.
+        """
         guides = self._get_filenames(self.userguides_path)
         for guide in guides:
             if guide == "quickstart":
@@ -97,6 +139,9 @@ class Documentation:
 
     @property
     def userguide_names(self) -> list[str]:
+        """
+        An ordered list of all userguides.
+        """
         guides = self._get_filenames(self.userguides_path)
         if not (quickstart := self.quickstart_name):
             # Guides has no quickstart.
@@ -106,10 +151,16 @@ class Documentation:
 
     @property
     def cli_reference_names(self) -> list[str]:
+        """
+        An ordered list of all CLI references.
+        """
         return self._get_filenames(self.commands_path)
 
     @property
     def methoddoc_names(self) -> list[str]:
+        """
+        An ordered list of all method references.
+        """
         return self._get_filenames(self.methoddocs_path)
 
     def _get_filenames(self, path: Path) -> list[str]:

@@ -67,10 +67,12 @@ class DocumentationBuilder(Documentation):
         base_path: Optional[Path] = None,
         name: Optional[str] = None,
         pages_branch_name: Optional[str] = None,
+        toc_tree_orders: Optional[dict[str, list[str]]] = None,
     ) -> None:
         self.mode = BuildMode.LATEST if mode is None else mode
         super().__init__(base_path, name)
         self._pages_branch_name = pages_branch_name or "gh-pages"
+        self._toc_tree_orders = toc_tree_orders
 
     def build(self):
         """
@@ -105,7 +107,10 @@ class DocumentationBuilder(Documentation):
         self._setup_redirect()
 
     def clean(self):
-        shutil.rmtree(self.root_build_path)
+        """
+        Clean build directories.
+        """
+        shutil.rmtree(self.root_build_path, ignore_errors=True)
 
     def publish(self, repository: Optional[str] = None, push: bool = True):
         """
