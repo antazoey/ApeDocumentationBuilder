@@ -45,6 +45,29 @@ class TestDocumentationBuilder:
     def mock_git(self, mocker):
         return mocker.patch("sphinx_ape.build.git")
 
+    @pytest.mark.parametrize(
+        "quickstart_name,quickstart_title",
+        [
+            ("quickstart", "Overview"),
+            ("overview", "Overview"),
+            ("quickstart", "Quickstart"),
+            ("overview", "Quickstart"),
+        ],
+    )
+    def test_userguide_names(self, temp_path, quickstart_name, quickstart_title):
+        builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
+        builder.init(include_quickstart=False)
+        builder.userguides_path.mkdir(parents=True, exist_ok=True)
+        guide1 = builder.userguides_path / "guide1.md"
+        guide1.write_text("# Guide\n\nThis is a guide\n")
+        overview = builder.userguides_path / f"{quickstart_name}.md"
+        overview.write_text(f"# {quickstart_title}\n\nThis is a quickstart")
+
+        actual = builder.userguide_names
+        # NOTE: Quickstart always comes first!
+        expected = [quickstart_name, "guide1"]
+        assert actual == expected
+
     def test_build_latest(self, temp_path):
         builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
         builder.init()  # so there is something to build.
@@ -53,7 +76,7 @@ class TestDocumentationBuilder:
 
         # Ensure re-direct exists and points to latest/.
         assert builder.index_file.is_file()
-        expected_content = REDIRECT_HTML.format("latest")
+        expected_content = REDIRECT_HTML.format("latest/userguides/quickstart.html")
         assert builder.index_file.read_text() == expected_content
 
         # Ensure static content exists.
@@ -72,7 +95,7 @@ class TestDocumentationBuilder:
         assert_build_path(call_path.parent / "stable", "stable")
         # Ensure re-direct exists and points to stable/.
         assert builder.index_file.is_file()
-        expected_content = REDIRECT_HTML.format("stable")
+        expected_content = REDIRECT_HTML.format("stable/")
         assert builder.index_file.read_text() == expected_content
 
     @pytest.mark.parametrize("sub_tag", ("alpha", "beta"))

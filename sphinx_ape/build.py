@@ -12,7 +12,7 @@ REDIRECT_HTML = """
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Redirecting...</title>
-<meta http-equiv="refresh" content="0; URL=./{}/">
+<meta http-equiv="refresh" content="0; URL=./{}">
 """
 
 
@@ -132,7 +132,7 @@ class DocumentationBuilder(Documentation):
         else:
             repo_url = extract_source_url()
 
-        gh_pages_path = self._base_path / "gh-pages"
+        gh_pages_path = self.base_path / "gh-pages"
         git(
             "clone",
             repo_url,
@@ -207,7 +207,12 @@ class DocumentationBuilder(Documentation):
 
     def _setup_redirect(self):
         self.build_path.mkdir(exist_ok=True, parents=True)
-        redirect = "stable" if self.stable_path.is_dir() else "latest"
+        redirect = "stable/" if self.stable_path.is_dir() else "latest/"
+
+        # When there is a quickstart, redirect to that instead of the toctree root.
+        if quickstart := self.quickstart_name:
+            redirect = f"{redirect}userguides/{quickstart}.html"
+
         # We replace it to handle the case when stable has joined the chat.
         self.index_file.unlink(missing_ok=True)
         self.index_file.write_text(REDIRECT_HTML.format(redirect))

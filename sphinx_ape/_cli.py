@@ -102,7 +102,7 @@ def serve(base_path, host, port, open):
             ]
             if len(built_docs) == 1:
                 # Only one package, dir-listing not necessary.
-                url = f"{url}{built_docs[0]}/latest"
+                url = f"{url}{built_docs[0]}"
 
             click.launch(url)
 
