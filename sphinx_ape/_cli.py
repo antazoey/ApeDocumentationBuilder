@@ -154,6 +154,16 @@ def publish(base_path, mode, repo, skip_push):
         sys.exit(1)
 
 
+@cli.command()
+@click.argument("base_path", type=Path)
+def clean(base_path):
+    """
+    Delete build artifacts
+    """
+    builder = _create_builder(base_path=base_path)
+    builder.clean()
+
+
 def _create_builder(*args, **kwargs) -> DocumentationBuilder:
     # Abstracted for testing purposes.
     return DocumentationBuilder(*args, **kwargs)

@@ -83,6 +83,17 @@ def setup(app: Sphinx):
         "model_fields",
         "model_post_init",
         "model_computed_fields",
+        "__class_vars__",
+        "__private_attributes__",
+        "__pydantic_complete__",
+        "__pydantic_core_schema__",
+        "__pydantic_custom_init__",
+        "__pydantic_decorators__",
+        "__pydantic_generic_metadata__",
+        "__pydantic_parent_namespace__",
+        "__pydantic_post_init__",
+        "__pydantic_serializer__",
+        "__pydantic_validator__",
         # EthPydanticTypes.
         "__ape_extra_attributes__",
     )
