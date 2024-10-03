@@ -1,3 +1,4 @@
+from functools import cached_property
 from pathlib import Path
 from typing import Optional
 
@@ -6,12 +7,12 @@ from sphinx_ape._utils import get_package_name
 
 class Documentation:
     def __init__(self, base_path: Optional[Path] = None, name: Optional[str] = None) -> None:
-        self._base_path = base_path or Path.cwd()
+        self.base_path = base_path or Path.cwd()
         self._name = name or get_package_name()
 
     @property
     def docs_path(self) -> Path:
-        return self._base_path / "docs"
+        return self.base_path / "docs"
 
     @property
     def root_build_path(self) -> Path:
@@ -49,11 +50,13 @@ class Documentation:
     def index_file(self) -> Path:
         return self.build_path / "index.html"
 
-    def init(self):
+    def init(self, include_quickstart: bool = True):
         if not self.docs_path.is_dir():
             self.docs_path.mkdir()
 
-        self._ensure_quickstart_exists()
+        if include_quickstart:
+            self._ensure_quickstart_exists()
+
         self._ensure_conf_exists()
         self._ensure_index_exists()
 
@@ -81,15 +84,25 @@ class Documentation:
         self.userguides_path.mkdir(exist_ok=True)
         quickstart_path.write_text("```{include} ../../README.md\n```\n")
 
+    @cached_property
+    def quickstart_name(self) -> Optional[str]:
+        guides = self._get_filenames(self.userguides_path)
+        for guide in guides:
+            if guide == "quickstart":
+                return guide
+            elif guide == "overview":
+                return guide
+
+        return None
+
     @property
     def userguide_names(self) -> list[str]:
         guides = self._get_filenames(self.userguides_path)
-        quickstart_name = "userguides/quickstart"
-        if quickstart_name in guides:
-            # Make sure quick start is first.
-            guides = [quickstart_name, *[g for g in guides if g != quickstart_name]]
+        if not (quickstart := self.quickstart_name):
+            # Guides has no quickstart.
+            return guides
 
-        return guides
+        return [quickstart, *[g for g in guides if g != quickstart]]
 
     @property
     def cli_reference_names(self) -> list[str]:

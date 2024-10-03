@@ -1,4 +1,4 @@
-# Quick Start
+# Overview
 
 `sphinx-ape` is a documentation plugin for the Sphinx framework.
 The purpose of this plugin to share code for generating documentation across all ApeWorX repositories.
