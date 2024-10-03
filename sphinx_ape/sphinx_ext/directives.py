@@ -4,6 +4,7 @@ from docutils.parsers.rst import directives
 from sphinx.util.docutils import SphinxDirective
 
 from sphinx_ape.build import DocumentationBuilder
+from sphinx_ape.types import TOCTreeSpec
 
 
 class DynamicTocTree(SphinxDirective):
@@ -14,6 +15,9 @@ class DynamicTocTree(SphinxDirective):
 
     option_spec = {
         "title": directives.unchanged,
+        "userguides": directives.unchanged,
+        "commands": directives.unchanged,
+        "methoddocs": directives.unchanged,
     }
 
     @property
@@ -40,8 +44,19 @@ class DynamicTocTree(SphinxDirective):
         return f"{title}\n{bar}"
 
     @property
+    def toc_tree_spec(self) -> TOCTreeSpec:
+        return TOCTreeSpec(
+            userguides=self.options.get("userguides"),
+            methoddocs=self.options.get("methoddocs"),
+            commands=self.options.get("commands"),
+        )
+
+    @property
     def builder(self) -> DocumentationBuilder:
-        return DocumentationBuilder(base_path=self._base_path.parent)
+        return DocumentationBuilder(
+            base_path=self._base_path.parent,
+            toc_tree_spec=self.toc_tree_spec,
+        )
 
     def run(self):
         userguides = self._get_userguides()

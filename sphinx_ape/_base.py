@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from sphinx_ape._utils import get_package_name
+from sphinx_ape.types import TOCTreeSpec
 
 
 class Documentation:
@@ -11,9 +12,10 @@ class Documentation:
     project.
     """
 
-    def __init__(self, base_path: Optional[Path] = None, name: Optional[str] = None) -> None:
+    def __init__(self, base_path: Optional[Path] = None, name: Optional[str] = None, toc_tree_spec: Optional[TOCTreeSpec] = None) -> None:
         self.base_path = base_path or Path.cwd()
         self._name = name or get_package_name()
+        self._toc_tree_spec = toc_tree_spec or TOCTreeSpec()
 
     @property
     def docs_path(self) -> Path:
@@ -167,4 +169,15 @@ class Documentation:
         if not path.is_dir():
             return []
 
-        return sorted([g.stem for g in path.iterdir() if g.suffix in (".md", ".rst")])
+        filenames = [p.stem for p in path.iterdir() if _is_doc(p)]
+        if spec := self._toc_tree_spec.get(path.name):
+            # Adhere to configured spec.
+            return [f for f in spec if f in filenames]
+
+        else:
+            # Default to a sorted order.
+            return sorted(filenames)
+
+
+def _is_doc(self, path: Path) -> bool:
+    return path.suffix in (".md", ".rst")

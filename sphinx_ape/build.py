@@ -7,6 +7,7 @@ from typing import Optional, Union
 from sphinx_ape._base import Documentation
 from sphinx_ape._utils import extract_source_url, git, replace_tree, sphinx_build
 from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError
+from sphinx_ape.types import TOCTreeSpec
 
 REDIRECT_HTML = """
 <!DOCTYPE html>
@@ -67,12 +68,11 @@ class DocumentationBuilder(Documentation):
         base_path: Optional[Path] = None,
         name: Optional[str] = None,
         pages_branch_name: Optional[str] = None,
-        toc_tree_orders: Optional[dict[str, list[str]]] = None,
+        toc_tree_spec: Optional[TOCTreeSpec] = None,
     ) -> None:
         self.mode = BuildMode.LATEST if mode is None else mode
-        super().__init__(base_path, name)
+        super().__init__(base_path, name, toc_tree_spec=toc_tree_spec)
         self._pages_branch_name = pages_branch_name or "gh-pages"
-        self._toc_tree_orders = toc_tree_orders
 
     def build(self):
         """
