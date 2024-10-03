@@ -104,6 +104,9 @@ class DocumentationBuilder(Documentation):
 
         self._setup_redirect()
 
+    def clean(self):
+        shutil.rmtree(self.root_build_path)
+
     def publish(self, repository: Optional[str] = None, push: bool = True):
         """
         Publish the documentation to GitHub pages.

@@ -14,8 +14,12 @@ class Documentation:
         return self._base_path / "docs"
 
     @property
+    def root_build_path(self) -> Path:
+        return self.docs_path / "_build"
+
+    @property
     def build_path(self) -> Path:
-        return self.docs_path / "_build" / self._name
+        return self.root_build_path / self._name
 
     @property
     def latest_path(self) -> Path:
