@@ -8,8 +8,7 @@ from sphinx_ape.types import TOCTreeSpec
 
 class Documentation:
     """
-    The base-documentation class for working with a sphinx-ape
-    project.
+    The base-documentation class for working with a sphinx-ape project.
     """
 
     def __init__(
@@ -64,7 +63,7 @@ class Documentation:
     @property
     def commands_path(self) -> Path:
         """
-        The path to the generated  CLI documentation.
+        The path to the generated CLI documentation.
         """
         return self.docs_path / "commands"
 

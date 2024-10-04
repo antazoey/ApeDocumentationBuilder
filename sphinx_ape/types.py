@@ -4,10 +4,10 @@ from typing import Optional
 class TOCTreeSpec(dict[str, list[str]]):
     """
     Specify the structure of the auto-generated TOC-tree
-    by specifying guide names user the keys ``"userguides"``,
+    by specifying names of guides via the keys ``"userguides"``,
     ``"commands"``, and ``"methoddocs"``. The TOC-tree
     will lay out the contents in that order and exclude
-    any missing guides. Meant to be a workaround when
+    any missing guides. It's meant to be a workaround when
     the default behavior is inadequate.
     """
 
