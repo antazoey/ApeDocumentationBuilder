@@ -179,20 +179,21 @@ class TestDocumentationBuilder:
     @pytest.mark.parametrize(
         "guide_ls",
         [
-            ("guide0, guide1, final"),
-            ("guide0\nguide1\nfinal"),
-            ("\n        - guide0\n        - guide1\n        - final"),
+            ("quickstart, guide0, guide1, final"),
+            ("\n        - quickstart\n        - guide0\n        - guide1\n        - final"),
         ],
     )
     def test_build_custom_toc_tree(self, temp_path, guide_ls):
         builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
+        readme = temp_path / "README.md"
+        readme.write_text("# Overview\n\nThis is an overview.")
         builder.init()  # so there is something to build.
         guide0 = builder.userguides_path / "guide0.md"
-        guide0.write_text("# Guide 0")
+        guide0.write_text("# Guide 0\n\nWelcome")
         guide1 = builder.userguides_path / "guide1.md"
-        guide1.write_text("# Guide 01")
+        guide1.write_text("# Guide 1\n\nWelcome")
         final = builder.userguides_path / "final.md"
-        final.write_text("# Final")
+        final.write_text("# Final\n\nWelcome")
         custom_toc = f".. dynamic-toc-tree::\n    :userguides: {guide_ls}\n"
         builder.index_docs_file.unlink()
         builder.index_docs_file.write_text(custom_toc)
@@ -205,7 +206,20 @@ class TestDocumentationBuilder:
         expected = {"quickstart.html", "final.html", "guide1.html", "guide0.html"}
         assert actual == expected
 
-        # TODO: Show it used the correct order in the TOC somehow.
+        # Prove the order was maintained.
+        index_content = (builder.latest_path / "index.html").read_text()
+        form = (
+            '<li class="toctree-l1"><a class="reference internal" '
+            'href="userguides/{0}.html">{1}</a></li>'
+        )
+        expected_ls = [
+            form.format("quickstart", "Overview"),
+            form.format("guide0", "Guide 0"),
+            form.format("guide1", "Guide 1"),
+            form.format("final", "Final"),
+        ]
+        expected_order = "\n".join(expected_ls)
+        assert expected_order in index_content
 
     def test_build_handles_plugins(self, temp_path):
         """

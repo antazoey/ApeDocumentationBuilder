@@ -181,7 +181,7 @@ class Documentation:
         if not path.is_dir():
             return []
 
-        filenames = [p.stem for p in path.iterdir() if _is_doc(p)]
+        filenames = {p.stem for p in path.iterdir() if _is_doc(p)}
         if spec := self._toc_tree_spec.get(path.name):
             # Adhere to configured order and filtering.
             return [f for f in spec if f in filenames]
