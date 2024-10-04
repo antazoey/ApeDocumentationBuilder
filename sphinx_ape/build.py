@@ -7,6 +7,7 @@ from typing import Optional, Union
 from sphinx_ape._base import Documentation
 from sphinx_ape._utils import extract_source_url, git, replace_tree, sphinx_build
 from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError
+from sphinx_ape.types import TOCTreeSpec
 
 REDIRECT_HTML = """
 <!DOCTYPE html>
@@ -67,9 +68,10 @@ class DocumentationBuilder(Documentation):
         base_path: Optional[Path] = None,
         name: Optional[str] = None,
         pages_branch_name: Optional[str] = None,
+        toc_tree_spec: Optional[TOCTreeSpec] = None,
     ) -> None:
         self.mode = BuildMode.LATEST if mode is None else mode
-        super().__init__(base_path, name)
+        super().__init__(base_path, name, toc_tree_spec=toc_tree_spec)
         self._pages_branch_name = pages_branch_name or "gh-pages"
 
     def build(self):
@@ -105,7 +107,10 @@ class DocumentationBuilder(Documentation):
         self._setup_redirect()
 
     def clean(self):
-        shutil.rmtree(self.root_build_path)
+        """
+        Clean build directories.
+        """
+        shutil.rmtree(self.root_build_path, ignore_errors=True)
 
     def publish(self, repository: Optional[str] = None, push: bool = True):
         """
@@ -214,8 +219,8 @@ class DocumentationBuilder(Documentation):
             redirect = f"{redirect}userguides/{quickstart}.html"
 
         # We replace it to handle the case when stable has joined the chat.
-        self.index_file.unlink(missing_ok=True)
-        self.index_file.write_text(REDIRECT_HTML.format(redirect))
+        self.index_html_file.unlink(missing_ok=True)
+        self.index_html_file.write_text(REDIRECT_HTML.format(redirect))
 
     def _sphinx_build(self, dst_path: Path):
         shutil.rmtree(dst_path, ignore_errors=True)

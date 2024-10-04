@@ -75,9 +75,9 @@ class TestDocumentationBuilder:
         assert builder.latest_path.is_dir()
 
         # Ensure re-direct exists and points to latest/.
-        assert builder.index_file.is_file()
+        assert builder.index_html_file.is_file()
         expected_content = REDIRECT_HTML.format("latest/userguides/quickstart.html")
-        assert builder.index_file.read_text() == expected_content
+        assert builder.index_html_file.read_text() == expected_content
 
         # Ensure static content exists.
         assert (builder.latest_path / "_static").is_dir()
@@ -94,9 +94,9 @@ class TestDocumentationBuilder:
         assert_build_path(call_path.parent / "latest", "latest")
         assert_build_path(call_path.parent / "stable", "stable")
         # Ensure re-direct exists and points to stable/.
-        assert builder.index_file.is_file()
+        assert builder.index_html_file.is_file()
         expected_content = REDIRECT_HTML.format("stable/")
-        assert builder.index_file.read_text() == expected_content
+        assert builder.index_html_file.read_text() == expected_content
 
     @pytest.mark.parametrize("sub_tag", ("alpha", "beta"))
     def test_build_alpha_release(self, sub_tag, mock_sphinx, mock_git, temp_path):
@@ -122,7 +122,7 @@ class TestDocumentationBuilder:
         stable_dir = gh_pages_path / "stable"
         latest_dir = gh_pages_path / "latest"
         tag_dir = gh_pages_path / tag
-        index_file = gh_pages_path / builder.index_file.name
+        index_file = gh_pages_path / builder.index_html_file.name
         static_dir = latest_dir / "_static"
 
         # Create a random file in _static to show it doesn't matter.
@@ -162,7 +162,7 @@ class TestDocumentationBuilder:
         stable_dir = gh_pages_path / "stable"
         latest_dir = gh_pages_path / "latest"
         tag_dir = gh_pages_path / tag
-        index_file = gh_pages_path / builder.index_file.name
+        index_file = gh_pages_path / builder.index_html_file.name
         assert gh_pages_path.is_dir()
         assert nojekyll_file.is_file()
         assert stable_dir.is_dir()
@@ -175,3 +175,80 @@ class TestDocumentationBuilder:
             assert static_dir.is_dir(), f"Missing static: {directory.name}"
             logo = static_dir / "logo_green.svg"
             assert logo.is_file(), f"Missing logo: {directory.name}"
+
+    @pytest.mark.parametrize(
+        "guide_ls",
+        [
+            ("quickstart, guide0, guide1, final"),
+            ("\n        - quickstart\n        - guide0\n        - guide1\n        - final"),
+        ],
+    )
+    def test_build_custom_toc_tree(self, temp_path, guide_ls):
+        builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
+        readme = temp_path / "README.md"
+        readme.write_text("# Overview\n\nThis is an overview.")
+        builder.init()  # so there is something to build.
+        guide0 = builder.userguides_path / "guide0.md"
+        guide0.write_text("# Guide 0\n\nWelcome")
+        guide1 = builder.userguides_path / "guide1.md"
+        guide1.write_text("# Guide 1\n\nWelcome")
+        final = builder.userguides_path / "final.md"
+        final.write_text("# Final\n\nWelcome")
+        custom_toc = f".. dynamic-toc-tree::\n    :userguides: {guide_ls}\n"
+        builder.index_docs_file.unlink()
+        builder.index_docs_file.write_text(custom_toc)
+
+        builder.build()
+
+        # Show it only included what was configured.
+        built_userguides = builder.latest_path / "userguides"
+        actual = {x.name for x in built_userguides.iterdir()}
+        expected = {"quickstart.html", "final.html", "guide1.html", "guide0.html"}
+        assert actual == expected
+
+        # Prove the order was maintained.
+        index_content = (builder.latest_path / "index.html").read_text()
+        form = (
+            '<li class="toctree-l1"><a class="reference internal" '
+            'href="userguides/{0}.html">{1}</a></li>'
+        )
+        expected_ls = [
+            form.format("quickstart", "Overview"),
+            form.format("guide0", "Guide 0"),
+            form.format("guide1", "Guide 1"),
+            form.format("final", "Final"),
+        ]
+        expected_order = "\n".join(expected_ls)
+        assert expected_order in index_content
+
+    def test_build_handles_plugins(self, temp_path):
+        """
+        When using plugin-prefix, you can separate out the plugin python
+        docs from the core python docs (such as what the Ape framework does).
+        """
+        builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
+        builder.init()  # so there is something to build.
+        custom_toc = ".. dynamic-toc-tree::\n    :plugin-prefix: ape_\n"
+        builder.index_docs_file.unlink()
+        builder.index_docs_file.write_text(custom_toc)
+        builder.methoddocs_path.mkdir(exist_ok=True, parents=True)
+        plugin_doc = builder.methoddocs_path / "ape_plugin.md"
+        plugin_doc.write_text(
+            "# Plugin]\n\n```{eval_rst}\n.. automodule:: ape_plugin\n    :members:```"
+        )
+        core_doc = builder.methoddocs_path / "api.md"
+        core_doc.write_text("# API]\n\n```{eval_rst}\n.. automodule:: api.api\n    :members:```")
+
+        builder.build()
+
+        built_methoddocs_path = builder.latest_path / "methoddocs"
+        built_methoddocs = {f.name for f in built_methoddocs_path.iterdir()}
+
+        # Show both docs got created.
+        assert "ape_plugin.html" in built_methoddocs
+        assert "api.html" in built_methoddocs
+
+        # Show the plugin and core docs are separated in the TOC.
+        index_content = (builder.latest_path / "index.html").read_text()
+        assert "Plugin Python Reference" in index_content
+        assert "Core Python Reference" in index_content

@@ -1,9 +1,11 @@
 from pathlib import Path
+from typing import Optional
 
 from docutils.parsers.rst import directives
 from sphinx.util.docutils import SphinxDirective
 
 from sphinx_ape.build import DocumentationBuilder
+from sphinx_ape.types import TOCTreeSpec
 
 
 class DynamicTocTree(SphinxDirective):
@@ -14,6 +16,10 @@ class DynamicTocTree(SphinxDirective):
 
     option_spec = {
         "title": directives.unchanged,
+        "plugin-prefix": directives.unchanged,
+        "userguides": directives.unchanged,
+        "commands": directives.unchanged,
+        "methoddocs": directives.unchanged,
     }
 
     @property
@@ -25,7 +31,7 @@ class DynamicTocTree(SphinxDirective):
     def title(self) -> str:
         if res := self.options.get("title"):
             # User configured the title.
-            return res
+            return res.strip()
 
         # Deduced: "Ape-Docs" or "Ape-Vyper-Docs", etc.
         name = self._base_path.parent.name
@@ -34,26 +40,45 @@ class DynamicTocTree(SphinxDirective):
         return f"{capped_name}-Docs"
 
     @property
+    def plugin_prefix(self) -> Optional[str]:
+        return self.options.get("plugin-prefix", "").strip()
+
+    @property
     def _title_rst(self) -> str:
         title = self.title
         bar = "=" * len(title)
         return f"{title}\n{bar}"
 
     @property
+    def toc_tree_spec(self) -> TOCTreeSpec:
+        return TOCTreeSpec(
+            userguides=_parse_spec(self.options.get("userguides")),
+            methoddocs=_parse_spec(self.options.get("methoddocs")),
+            commands=_parse_spec(self.options.get("commands")),
+        )
+
+    @property
     def builder(self) -> DocumentationBuilder:
-        return DocumentationBuilder(base_path=self._base_path.parent)
+        return DocumentationBuilder(
+            base_path=self._base_path.parent,
+            toc_tree_spec=self.toc_tree_spec,
+        )
 
     def run(self):
         userguides = self._get_userguides()
         cli_docs = self._get_cli_references()
         methoddocs = self._get_methoddocs()
-        plugin_methoddocs = [d for d in methoddocs if d.startswith("ape-")]
+        if plugin_prefix := self.plugin_prefix:
+            plugin_methoddocs = [d for d in methoddocs if Path(d).stem.startswith(plugin_prefix)]
+        else:
+            plugin_methoddocs = []
+
         methoddocs = [d for d in methoddocs if d not in plugin_methoddocs]
         sections = {"User Guides": userguides, "CLI Reference": cli_docs}
         if plugin_methoddocs:
-            # Core (or alike)
+            # Core (or alike).
+            sections["Core Python Reference"] = methoddocs  # Put _before_ plugins!
             sections["Plugin Python Reference"] = plugin_methoddocs
-            sections["Core Python Reference"] = methoddocs
         else:
             # Plugin or regular package.
             sections["Python Reference"] = methoddocs
@@ -84,3 +109,10 @@ class DynamicTocTree(SphinxDirective):
 
     def _get_methoddocs(self) -> list[str]:
         return [f"methoddocs/{n}" for n in self.builder.methoddoc_names]
+
+
+def _parse_spec(value) -> list[str]:
+    if value is None:
+        return []
+
+    return [n.strip(" -\n\t,") for n in value.split(" ") if n.strip(" -\n\t")]
