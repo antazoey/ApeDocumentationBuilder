@@ -206,3 +206,35 @@ class TestDocumentationBuilder:
         assert actual == expected
 
         # TODO: Show it used the correct order in the TOC somehow.
+
+    def test_build_handles_plugins(self, temp_path):
+        """
+        When using plugin-prefix, you can separate out the plugin python
+        docs from the core python docs (such as what the Ape framework does).
+        """
+        builder = DocumentationBuilder(mode=BuildMode.LATEST, base_path=temp_path)
+        builder.init()  # so there is something to build.
+        custom_toc = ".. dynamic-toc-tree::\n    :plugin-prefix: ape_\n"
+        builder.index_docs_file.unlink()
+        builder.index_docs_file.write_text(custom_toc)
+        builder.methoddocs_path.mkdir(exist_ok=True, parents=True)
+        plugin_doc = builder.methoddocs_path / "ape_plugin.md"
+        plugin_doc.write_text(
+            "# Plugin]\n\n```{eval_rst}\n.. automodule:: ape_plugin\n    :members:```"
+        )
+        core_doc = builder.methoddocs_path / "api.md"
+        core_doc.write_text("# API]\n\n```{eval_rst}\n.. automodule:: api.api\n    :members:```")
+
+        builder.build()
+
+        built_methoddocs_path = builder.latest_path / "methoddocs"
+        built_methoddocs = {f.name for f in built_methoddocs_path.iterdir()}
+
+        # Show both docs got created.
+        assert "ape_plugin.html" in built_methoddocs
+        assert "api.html" in built_methoddocs
+
+        # Show the plugin and core docs are separated in the TOC.
+        index_content = (builder.latest_path / "index.html").read_text()
+        assert "Plugin Python Reference" in index_content
+        assert "Core Python Reference" in index_content

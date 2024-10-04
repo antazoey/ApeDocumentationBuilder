@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from docutils.parsers.rst import directives
 from sphinx.util.docutils import SphinxDirective
@@ -15,6 +16,7 @@ class DynamicTocTree(SphinxDirective):
 
     option_spec = {
         "title": directives.unchanged,
+        "plugin-prefix": directives.unchanged,
         "userguides": directives.unchanged,
         "commands": directives.unchanged,
         "methoddocs": directives.unchanged,
@@ -29,13 +31,17 @@ class DynamicTocTree(SphinxDirective):
     def title(self) -> str:
         if res := self.options.get("title"):
             # User configured the title.
-            return res
+            return res.strip()
 
         # Deduced: "Ape-Docs" or "Ape-Vyper-Docs", etc.
         name = self._base_path.parent.name
         name_parts = [n.capitalize() for n in name.split("-")]
         capped_name = "-".join(name_parts)
         return f"{capped_name}-Docs"
+
+    @property
+    def plugin_prefix(self) -> Optional[str]:
+        return self.options.get("plugin-prefix", "").strip()
 
     @property
     def _title_rst(self) -> str:
@@ -62,13 +68,17 @@ class DynamicTocTree(SphinxDirective):
         userguides = self._get_userguides()
         cli_docs = self._get_cli_references()
         methoddocs = self._get_methoddocs()
-        plugin_methoddocs = [d for d in methoddocs if d.startswith("ape-")]
+        if plugin_prefix := self.plugin_prefix:
+            plugin_methoddocs = [d for d in methoddocs if Path(d).stem.startswith(plugin_prefix)]
+        else:
+            plugin_methoddocs = []
+
         methoddocs = [d for d in methoddocs if d not in plugin_methoddocs]
         sections = {"User Guides": userguides, "CLI Reference": cli_docs}
         if plugin_methoddocs:
-            # Core (or alike)
+            # Core (or alike).
+            sections["Core Python Reference"] = methoddocs  # Put _before_ plugins!
             sections["Plugin Python Reference"] = plugin_methoddocs
-            sections["Core Python Reference"] = methoddocs
         else:
             # Plugin or regular package.
             sections["Python Reference"] = methoddocs
