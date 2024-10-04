@@ -87,11 +87,19 @@ Also use this feature to control the ordering of the guides; otherwise the defau
 
 ```rst
 .. dynamic-toc-tree::
-  :userguides: guide0, guide1, final
+    :userguides: guide0, guide1, final
 ```
 
-**NOTE**: You do not need to specify the quickstart guide.
-If you are using the quickstart guide, it will automatically appear first in the list.
+You can also specify the guides in a list pattern:
+
+```rst
+.. dynamic-toc-tree::
+    :userguides:
+      - quickstart 
+      - guide0
+      - guide1
+      - final
+```
 
 ## GitHub Action
 

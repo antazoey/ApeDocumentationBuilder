@@ -83,11 +83,18 @@ class Documentation:
         return self.docs_path / "conf.py"
 
     @property
-    def index_file(self) -> Path:
+    def index_html_file(self) -> Path:
         """
         The path to the index HTML file.
         """
         return self.build_path / "index.html"
+
+    @property
+    def index_docs_file(self) -> Path:
+        """
+        The path to the root docs index file.
+        """
+        return self.docs_path / "index.rst"
 
     def init(self, include_quickstart: bool = True):
         """
@@ -114,7 +121,7 @@ class Documentation:
         self.conf_file.write_text(content)
 
     def _ensure_index_exists(self):
-        index_file = self.docs_path / "index.rst"
+        index_file = self.index_docs_file
         if index_file.is_file():
             return
 

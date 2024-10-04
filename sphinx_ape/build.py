@@ -219,8 +219,8 @@ class DocumentationBuilder(Documentation):
             redirect = f"{redirect}userguides/{quickstart}.html"
 
         # We replace it to handle the case when stable has joined the chat.
-        self.index_file.unlink(missing_ok=True)
-        self.index_file.write_text(REDIRECT_HTML.format(redirect))
+        self.index_html_file.unlink(missing_ok=True)
+        self.index_html_file.write_text(REDIRECT_HTML.format(redirect))
 
     def _sphinx_build(self, dst_path: Path):
         shutil.rmtree(dst_path, ignore_errors=True)

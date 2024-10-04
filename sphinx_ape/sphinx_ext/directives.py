@@ -105,4 +105,4 @@ def _parse_spec(value) -> list[str]:
     if value is None:
         return []
 
-    return [n.strip() for n in value.split(" ")]
+    return [n.strip(" -\n\t") for n in value.split(" ") if n.strip(" -\n\t")]
