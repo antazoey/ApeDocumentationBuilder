@@ -6,7 +6,7 @@ import click
 
 from sphinx_ape._utils import get_package_name
 from sphinx_ape.build import BuildMode, DocumentationBuilder
-from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError, ApeDocsTestError
+from sphinx_ape.exceptions import BuildError, PublishError, TestError
 from sphinx_ape.testing import DocumentationTester
 
 
@@ -64,7 +64,7 @@ def build(base_path, mode, package_name):
     click.echo(f"Building '{package_name}' '{mode.name}'.")
     try:
         builder.build()
-    except ApeDocsBuildError as err:
+    except BuildError as err:
         click.echo(f"ERROR: {err}", err=True)
         sys.exit(1)
 
@@ -124,7 +124,7 @@ def test(base_path):
     tester = _create_tester(base_path=base_path)
     try:
         tester.test()
-    except ApeDocsTestError as err:
+    except TestError as err:
         click.echo(f"ERROR: {err}", err=True)
         sys.exit(1)
 
@@ -149,7 +149,7 @@ def publish(base_path, mode, repo, skip_push):
     builder = _create_builder(mode=mode, base_path=base_path)
     try:
         builder.publish(repository=repo, push=not skip_push)
-    except ApeDocsPublishError as err:
+    except PublishError as err:
         click.echo(f"ERROR: {err}", err=True)
         sys.exit(1)
 

@@ -2,7 +2,7 @@ import subprocess
 from pathlib import Path
 
 from sphinx_ape._base import Documentation
-from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsTestError
+from sphinx_ape.exceptions import BuildError, TestError
 
 
 class DocumentationTester(Documentation):
@@ -38,7 +38,7 @@ class DocumentationTester(Documentation):
             return
 
         # Failures.
-        raise ApeDocsTestError(output)
+        raise TestError(output)
 
     def _run_tests(self):
         try:
@@ -46,4 +46,4 @@ class DocumentationTester(Documentation):
                 ["sphinx-build", "-b", "doctest", "docs", str(self.doctest_folder)], check=True
             )
         except subprocess.CalledProcessError as err:
-            raise ApeDocsBuildError(str(err)) from err
+            raise BuildError(str(err)) from err

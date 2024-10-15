@@ -7,7 +7,7 @@ from typing import Any, Optional, Union
 
 import tomli
 
-from sphinx_ape.exceptions import ApeDocsBuildError
+from sphinx_ape.exceptions import BuildError
 
 # Avoid needing to have common Ape packages re-configure this.
 PACKAGE_ALIASES = {
@@ -32,7 +32,7 @@ def sphinx_build(dst_path: Path, source_dir: Union[Path, str]) -> Path:
     try:
         subprocess.check_call(["sphinx-build", str(source_dir), str(path)])
     except subprocess.SubprocessError as err:
-        raise ApeDocsBuildError(f"Command 'sphinx-build docs {path}' failed.") from err
+        raise BuildError(f"Command 'sphinx-build docs {path}' failed.") from err
 
     return path
 
@@ -50,7 +50,7 @@ def extract_source_url(directory: Optional[Path] = None) -> str:
     if (directory / "setup.py").is_file():
         url = _extract_github_url_from_setup_py(directory / "setup.py")
     if url is None:
-        raise ApeDocsBuildError("No package source URL found.")
+        raise BuildError("No package source URL found.")
 
     return url
 
@@ -129,7 +129,7 @@ def extract_package_name(directory: Optional[Path] = None) -> str:
         pkg_name = _extract_name_from_pyproject_toml(directory / "pyproject.toml")
     if pkg_name is None:
         path = f"{directory}".replace(f"{Path.home()}", "$HOME")
-        raise ApeDocsBuildError(f"No package name found at '{path}'.")
+        raise BuildError(f"No package name found at '{path}'.")
 
     return PACKAGE_ALIASES.get(pkg_name, pkg_name)
 
