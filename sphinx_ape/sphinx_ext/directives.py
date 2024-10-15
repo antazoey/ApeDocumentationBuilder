@@ -5,6 +5,7 @@ from docutils.parsers.rst import directives
 from sphinx.util.docutils import SphinxDirective
 
 from sphinx_ape.build import DocumentationBuilder
+from sphinx_ape.exceptions import BuildError
 from sphinx_ape.types import TOCTreeSpec
 
 
@@ -69,9 +70,6 @@ class DynamicTocTree(SphinxDirective):
         cli_docs = self._get_cli_references()
         methoddocs = self._get_methoddocs()
 
-        if not userguides and not cli_docs and not methoddocs:
-            raise Doc
-
         if plugin_prefix := self.plugin_prefix:
             plugin_methoddocs = [d for d in methoddocs if Path(d).stem.startswith(plugin_prefix)]
         else:
@@ -102,6 +100,10 @@ class DynamicTocTree(SphinxDirective):
         restructured_text = self._title_rst
         if toc_tree_rst:
             restructured_text = f"{restructured_text}\n\n{toc_tree_rst}"
+
+        # Ensure TOC is not empty (no docs?).
+        if not sections or not any(len(x) for x in sections.values()):
+            raise BuildError("Empty TOC.")
 
         return self.parse_text_to_nodes(restructured_text)
 
