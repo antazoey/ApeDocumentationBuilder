@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 from sphinx_ape._base import Documentation
 from sphinx_ape._utils import extract_source_url, git, replace_tree, sphinx_build
-from sphinx_ape.exceptions import ApeDocsBuildError, ApeDocsPublishError
+from sphinx_ape.exceptions import BuildError, PublishError
 from sphinx_ape.types import TOCTreeSpec
 
 REDIRECT_HTML = """
@@ -102,7 +102,7 @@ class DocumentationBuilder(Documentation):
 
         else:
             # Unknown 'mode'.
-            raise ApeDocsBuildError(f"Unsupported build-mode: {self.mode}")
+            raise BuildError(f"Unsupported build-mode: {self.mode}")
 
         self._setup_redirect()
 
@@ -129,7 +129,7 @@ class DocumentationBuilder(Documentation):
         try:
             self._publish(repository=repository, push=push)
         except Exception as err:
-            raise ApeDocsPublishError(str(err)) from err
+            raise PublishError(str(err)) from err
 
     def _publish(self, repository: Optional[str] = None, push: bool = True):
         if repository:
@@ -184,7 +184,7 @@ class DocumentationBuilder(Documentation):
 
     def _build_release(self):
         if not (tag := git("describe", "--tag")):
-            raise ApeDocsBuildError("Unable to find release tag.")
+            raise BuildError("Unable to find release tag.")
 
         if "beta" in tag or "alpha" in tag:
             # Avoid creating release directory for beta

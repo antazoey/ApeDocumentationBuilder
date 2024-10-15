@@ -4,19 +4,21 @@ class SphinxApeException(Exception):
     """
 
 
-class ApeDocsBuildError(SphinxApeException):
+class BuildError(SphinxApeException):
     """
     Building the docs failed.
     """
 
 
-class ApeDocsTestError(SphinxApeException):
+class TestError(SphinxApeException):
     """
     Running doc-tests failed.
     """
 
+    __test__ = False
 
-class ApeDocsPublishError(SphinxApeException):
+
+class PublishError(SphinxApeException):
     """
     Publishing the docs failed.
     """

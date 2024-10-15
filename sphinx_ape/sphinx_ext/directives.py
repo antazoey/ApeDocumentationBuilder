@@ -68,6 +68,10 @@ class DynamicTocTree(SphinxDirective):
         userguides = self._get_userguides()
         cli_docs = self._get_cli_references()
         methoddocs = self._get_methoddocs()
+
+        if not userguides and not cli_docs and not methoddocs:
+            raise Doc
+
         if plugin_prefix := self.plugin_prefix:
             plugin_methoddocs = [d for d in methoddocs if Path(d).stem.startswith(plugin_prefix)]
         else:
