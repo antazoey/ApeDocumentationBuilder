@@ -67,6 +67,11 @@ class DynamicTocTree(SphinxDirective):
 
     def run(self):
         userguides = self._get_userguides()
+
+        # TODO: DELETE THIS! FORCED TO DEBUG LIKE THIS.
+        if not userguides:
+            raise ValueError("DEBUG")
+
         cli_docs = self._get_cli_references()
         methoddocs = self._get_methoddocs()
 
