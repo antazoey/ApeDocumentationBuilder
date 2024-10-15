@@ -85,6 +85,10 @@ class DynamicTocTree(SphinxDirective):
             # Plugin or regular package.
             sections["Python Reference"] = methoddocs
 
+        # Ensure TOC is not empty (no docs?).
+        if not sections or not any(len(x) for x in sections.values()):
+            raise BuildError("Empty TOC.")
+
         toc_trees = []
         for caption, entries in sections.items():
             if len(entries) < 1:
@@ -100,10 +104,6 @@ class DynamicTocTree(SphinxDirective):
         restructured_text = self._title_rst
         if toc_tree_rst:
             restructured_text = f"{restructured_text}\n\n{toc_tree_rst}"
-
-        # Ensure TOC is not empty (no docs?).
-        if not sections or not any(len(x) for x in sections.values()):
-            raise BuildError("Empty TOC.")
 
         return self.parse_text_to_nodes(restructured_text)
 
