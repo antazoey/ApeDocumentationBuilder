@@ -64,8 +64,8 @@ setup(
         "pygments>=2.17.0,<3",  # Needed for the Vyper lexer
         "myst-parser>=4.0.0,<5",  # Parse markdown docs
         "sphinx-click>=6.0.0,<7",  # For documenting CLI
-        "Sphinx>=7.4.0,<8",  # Documentation generator
-        "sphinx_rtd_theme>=2.0.0,<3",  # Readthedocs.org theme
+        "Sphinx>=8.1.3,<9",  # Documentation generator
+        "sphinx_rtd_theme>=3.0.1,<4",  # Readthedocs.org theme
         "sphinxcontrib-napoleon>=0.7,<0.8",  # Allow Google-style documentation
         "sphinx-plausible>=0.1.2,<0.2",  # For analytics
     ],
