@@ -2,7 +2,7 @@ import os
 import shutil
 from enum import Enum
 from pathlib import Path
-from typing import Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from sphinx_ape._base import Documentation
 from sphinx_ape._utils import extract_source_url, git, replace_tree, sphinx_build
