@@ -2,12 +2,14 @@ import os
 import shutil
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, TYPE_CHECKING, Union
 
 from sphinx_ape._base import Documentation
 from sphinx_ape._utils import extract_source_url, git, replace_tree, sphinx_build
 from sphinx_ape.exceptions import BuildError, PublishError
-from sphinx_ape.types import TOCTreeSpec
+
+if TYPE_CHECKING:
+    from sphinx_ape.types import TOCTreeSpec
 
 REDIRECT_HTML = """
 <!DOCTYPE html>
@@ -68,7 +70,7 @@ class DocumentationBuilder(Documentation):
         base_path: Optional[Path] = None,
         name: Optional[str] = None,
         pages_branch_name: Optional[str] = None,
-        toc_tree_spec: Optional[TOCTreeSpec] = None,
+        toc_tree_spec: Optional["TOCTreeSpec"] = None,
     ) -> None:
         self.mode = BuildMode.LATEST if mode is None else mode
         super().__init__(base_path, name, toc_tree_spec=toc_tree_spec)

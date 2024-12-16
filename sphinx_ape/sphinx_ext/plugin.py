@@ -1,17 +1,20 @@
 import os
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from sphinx.application import Sphinx
 from sphinx.util import logging
 
 from sphinx_ape._utils import get_package_name
 from sphinx_ape.sphinx_ext.directives import DynamicTocTree
 
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
+
 logger = logging.getLogger(__name__)
 
 
-def setup(app: Sphinx):
+def setup(app: "Sphinx"):
     """Set default values for various Sphinx configurations."""
 
     # For building and serving multiple projects at once,
